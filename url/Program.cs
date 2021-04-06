@@ -12,9 +12,7 @@ namespace url
     {
         static void Main()
         {
-            ConsoleEx.LoggingUnhandledException();
             var a = Arguments.Load<Options>();
-            if (a.Help) return;
             foreach (var v in a.Values) Console.WriteLine(a.Options.Decode ? HttpUtility.UrlDecode(v) : HttpUtility.UrlEncode(v));
         }
         class Options

@@ -14,9 +14,7 @@ namespace json
     {
         static void Main()
         {
-            ConsoleEx.LoggingUnhandledException();
             var a = FileArguments.Load<Options>();
-            if (a.Help) return;
             foreach (var j in a.GetReaders()
                 .Select(_ =>
                 {

@@ -14,9 +14,7 @@ namespace base64
     {
         static void Main()
         {
-            ConsoleEx.LoggingUnhandledException();
             var a = FileArguments.Load<Options>();
-            if (a.Help) return;
             if (a.Options.Decode)
             {
                 using (var o = a.Options.GetOutputStream())
@@ -69,7 +67,7 @@ namespace base64
             [CommandValue]
             [Detail("output to (filepath).")]
             public string Output { get; set; } = null;
-            [Command]
+            [Command("n")]
             [CommandValue]
             [Detail("split encode string by (n) chars.")]
             public int Split { get; set; } = 64;

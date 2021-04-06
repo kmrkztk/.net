@@ -12,9 +12,7 @@ namespace ls
     {
         static void Main()
         {
-            ConsoleEx.LoggingUnhandledException();
             var a = FileArguments.Load<Options>();
-            if (a.Help) return;
             foreach (var d in a.GetFileSystems()
                 .Where(_ => a.Options.DisplayDirectory || (_.Attributes & FileAttributes.Directory) == 0)
                 .Select(_ => new Display(a.Options, _))) Console.WriteLine(d);

@@ -13,9 +13,7 @@ namespace _2icon
     {
         static void Main()
         {
-            ConsoleEx.LoggingUnhandledException();
             var a = FileArguments.Load();
-            if (a.Help) return;
             var bi = new FileInfo(a[0]);
             var ii = new FileInfo(bi.FullName.Replace(bi.Extension, ".ico"));
             using (var bmp = new Bitmap(a[0]))

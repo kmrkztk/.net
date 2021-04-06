@@ -13,9 +13,7 @@ namespace xml
     {
         static void Main()
         {
-            ConsoleEx.LoggingUnhandledException();
             var a = FileArguments.Load<Options>();
-            if (a.Help) return;
             foreach (var xml in a.GetReaders()
                 .Select(_ =>
                 {

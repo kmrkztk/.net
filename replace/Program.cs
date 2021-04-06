@@ -11,9 +11,7 @@ namespace replace
     {
         static void Main()
         {
-            ConsoleEx.LoggingUnhandledException();
             var a = FileArguments.Load<Options>();
-            if (a.Help) return;
             foreach (var reader in a.GetReaders())
             {
                 Console.WriteLine(reader.ReadToEnd().Replace(a.Options.Pattern, a.Options.Replace));

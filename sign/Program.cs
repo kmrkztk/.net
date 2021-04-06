@@ -12,9 +12,7 @@ namespace sign
     {
         static void Main()
         {
-            ConsoleEx.LoggingUnhandledException();
             var a = Arguments.Load();
-            if (a.Help) return;
             var config = Lib.Configuration.Config.Load<Config>();
             Console.WriteLine(config);
             Lib.Configuration.Config.Watch(config);

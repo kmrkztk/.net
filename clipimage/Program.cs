@@ -14,9 +14,7 @@ namespace clipimage
         [STAThread]
         static void Main()
         {
-            ConsoleEx.LoggingUnhandledException();
             var a = Arguments.Load();
-            if (a.Help) return;
             var bmp = new Bitmap(a[0]);
             Clipboard.SetImage(bmp);
             //Clipboard.SetDataObject(bmp, true);

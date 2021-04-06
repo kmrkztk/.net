@@ -13,11 +13,8 @@ namespace diff
     {
         static void Main()
         {
-            ConsoleEx.LoggingUnhandledException();
             var a = Arguments.Load<Options>();
-            if (a.Help) return;
             if (a.Values.Count < 2) throw new ArgumentException();
-
             IEnumerable<string> read(string fn)
             {
                 using (var f = new FileStream(fn, FileMode.Open))

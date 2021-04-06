@@ -12,9 +12,7 @@ namespace uni
     {
         static void Main()
         {
-            ConsoleEx.LoggingUnhandledException();
             var a = FileArguments.Load<Options>();
-            if (a.Help) return;
             foreach (var l in a.GetLines()) Console.WriteLine(a.Options.Encode ? l.UnicodeEscape(a.Options.Forced) : Regex.Unescape(l));
         }
         class Options

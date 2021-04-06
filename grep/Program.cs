@@ -13,9 +13,7 @@ namespace grep
     {
         static void Main()
         {
-            ConsoleEx.LoggingUnhandledException();
             var a = FileArguments.Load<Options>();
-            if (a.Help) return;
             var r = a.Options.Regex;
             var startwith = a.Options.StartWithRegex;
             var format = "{0}";

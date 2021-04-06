@@ -13,9 +13,7 @@ namespace hex
     {
         static void Main()
         {
-            ConsoleEx.LoggingUnhandledException();
             var a = FileArguments.Load<Options>();
-            if (a.Help) return;
             if (a.Options.Decode)
             {
                 foreach (var r in a.GetReaders()) Console.WriteLine(Encoding.UTF8.GetString(r.ReadToEnd().ToBinary()));

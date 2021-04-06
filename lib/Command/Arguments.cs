@@ -31,7 +31,10 @@ namespace Lib
             Initialize();
             Reset(args);
             if (DebugMode) PrintDebug();
-            if (Help) PrintHelp();
+            if (Help) {
+                PrintHelp();
+                Environment.Exit(0);
+            }
         }
         protected virtual void Initialize() => _map = new CommandMap(this);
         public virtual void Reset(IEnumerable<string> args)
