@@ -1,12 +1,63 @@
 {
 	"folders": [
 		{
-			"path": "."
+			"path": "base64"
+		},
+		{
+			"path": "2icon"
+		},
+		{
+			"path": "clipimage"
+		},
+		{
+			"path": "diff"
+		},
+		{
+			"path": "grep"
+		},
+		{
+			"path": "hex"
+		},
+		{
+			"path": "hoge"
+		},
+		{
+			"path": "json"
+		},
+		{
+			"path": "lib"
+		},
+		{
+			"path": "lib.Sign"
+		},
+		{
+			"path": "lib.Windows"
+		},
+		{
+			"path": "life"
+		},
+		{
+			"path": "ls"
+		},
+		{
+			"path": "replace"
+		},
+		{
+			"path": "sign"
+		},
+		{
+			"path": "uni"
+		},
+		{
+			"path": "url"
+		},
+		{
+			"path": "xml"
 		}
 	],
 	"settings": {},
 	"launch": {
 		"version": "0.2.0",
 		"configurations": []
-	}
+	},
 }
