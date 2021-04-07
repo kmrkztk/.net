@@ -50,7 +50,8 @@
     <Compile Include="Command\Arguments.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Console.cs" />
-    <Compile Include="DetailAttribute.cs" />
+    <Compile Include="Reflection\HiddenAttribute.cs" />
+    <Compile Include="Reflection\DetailAttribute.cs" />
     <Compile Include="Diff\Algorithm\DiffType.cs" />
     <Compile Include="Diff\Diff.cs" />
     <Compile Include="Diff\Algorithm\DiffAlgorithm.cs" />
@@ -74,12 +75,13 @@
     <Compile Include="Json\JsonObject.cs" />
     <Compile Include="Json\JsonReader.cs" />
     <Compile Include="Json\JsonValue.cs" />
-    <Compile Include="MappingAttribute.cs" />
+    <Compile Include="Reflection\MappingAttribute.cs" />
     <Compile Include="Command\CommandAttribute.cs" />
     <Compile Include="Command\CommandValueAttribute.cs" />
-    <Compile Include="PropertyMap.cs" />
+    <Compile Include="Reflection\PropertyMap.cs" />
     <Compile Include="Command\CommandMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reflection\ReflectionExtentions.cs" />
     <Compile Include="Reflection\ReflectiveEnumerator.cs" />
     <Compile Include="Text\Base64Encoder.cs" />
     <Compile Include="Extensions\BufferExtensions.cs" />

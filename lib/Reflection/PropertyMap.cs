@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.Collections;
+using Lib.Reflection;
 
 namespace Lib
 {
@@ -46,7 +47,7 @@ namespace Lib
             s.AppendLine(Path.GetFileName(Process.GetCurrentProcess().MainModule.FileName));
             foreach (var o in Targets) foreach(var c in DetailAttribute.GetContents(o)) s.AppendLine(c);
             s.AppendLine();
-            var ps = Properties;
+            var ps = Properties.Where(_ => !_.HasAttribute<HiddenAttribute>());
             var names = ps.ToDictionary(_ => _, _ => string.Join(" or ", GetNames(_)));
             var padding = names.Values.Max(_ => _.Length);
             foreach (var p in ps) s.AppendLine("  " + names[p].PadRight(padding) + " : " + string.Concat(DetailAttribute.GetContents(p)));

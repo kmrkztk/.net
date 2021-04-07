@@ -24,6 +24,7 @@ namespace Lib
         [Detail("view help.")]
         public bool Help { get; set; }
         [Command]
+        [Hidden]
         public bool DebugMode { get; set; }
         protected Arguments(IEnumerable<string> args, string option) 
         {
