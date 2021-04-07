@@ -35,19 +35,18 @@ namespace diff
                 d.Value,
                 d.Index,
                 d.Type.IsDelete ? '-' : d.Type.IsInsert ? '+' : ' ');
-#if DEBUG
-            ConsoleEx.Pause();
-#endif
         }
+        [Detail("diff file1 file2 [/options]")]
+        [Detail("compare files line by line.")]
         class Options
         {
-            [Command] [Command("a")] public bool All { get; set; }
-            [Command] [Command("n")] public bool LineNumber { get; set; }
-            [Command] [Command("i")] public bool Insert { get; set; }
-            [Command] [Command("d")] public bool Delete { get; set; }
-            [Command] public bool DP { get; set; }
-            [Command] public bool OND { get; set; }
-            [Command] public bool ONP { get; set; }
+            [Command] [Command("a")] [Detail("output all lines.")]        public bool All { get; set; }
+            [Command] [Command("n")] [Detail("output line number.")]      public bool LineNumber { get; set; }
+            [Command] [Command("i")] [Detail("output only insert line.")] public bool Insert { get; set; }
+            [Command] [Command("d")] [Detail("output only delete line.")] public bool Delete { get; set; }
+            [Command] [Detail("run with 'DP' algorithm.")]  public bool DP  { get; set; }
+            [Command] [Detail("run with 'OND' algorithm.")] public bool OND { get; set; }
+            [Command] [Detail("run with 'ONP' algorithm.")] public bool ONP { get; set; }
             public DiffAlgorithm<string> Algorithm => 
                 ONP ? DiffAlgorithm<string>.ONP : 
                 OND ? DiffAlgorithm<string>.OND : 
