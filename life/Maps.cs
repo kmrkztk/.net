@@ -9,7 +9,7 @@ namespace life
     public static class Maps
     {
         public static bool IsEmpty(Map map) => map.Width == 1 && map.Height == 1 && !map[0, 0];
-        public static Map Empty => new Map(0, 0);
+        public static Map Empty => new Map(1, 1);
         public static Map Block(int size) => Block(size, size);
         public static Map Block(int width, int height)
         {

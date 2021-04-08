@@ -40,7 +40,7 @@ namespace Lib.Windows.Controls
             var sort = this.ListViewItemSorter as Sorter;
             this.ListViewItemSorter = new Sorter(index, index == sort.Index ? !sort.Ascending : sort.Ascending);
         }
-        protected virtual bool Filter(ListViewItem item) => string.IsNullOrEmpty(_filter) ? true : Regex.IsMatch(item.Text, _filter, RegexOptions.IgnoreCase);
+        protected virtual bool Filter(ListViewItem item) => string.IsNullOrEmpty(_filter) || Regex.IsMatch(item.Text, _filter, RegexOptions.IgnoreCase);
         protected virtual IEnumerable<ListViewItem> GetItemList() => new ListViewItem[] { };
         class Sorter : IComparer
         {

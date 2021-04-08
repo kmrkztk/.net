@@ -40,7 +40,7 @@
             // 
             // _map
             // 
-            this._map.Size = new System.Drawing.Size(1, 1);
+            //this._map.Size = new System.Drawing.Size(1, 1);
             // 
             // _drawer
             // 
