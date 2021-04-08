@@ -11,9 +11,11 @@ namespace Lib
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
     public class MappingAttribute : Attribute
     {
-        public virtual string Name { get; protected set; }
+        public string Name { get; protected set; }
         public MappingAttribute(string name) => Name = name;
         public MappingAttribute() : this(null) { }
-        public static IEnumerable<string> GetNames(PropertyInfo pi) => pi.GetCustomAttributes<CommandAttribute>().Select(_ => _.Name ?? pi.Name);
+        public virtual string GetMappingName(PropertyInfo pi) => Name ?? pi.Name;
+        public static IEnumerable<string> GetMappingNames(PropertyInfo pi) 
+            => pi.GetCustomAttributes<MappingAttribute>().Select(_ => _.GetMappingName(pi));
     }
 }

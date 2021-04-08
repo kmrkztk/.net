@@ -1,24 +1,30 @@
 ﻿using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
+using Lib.Collections;
+using Lib.Reflection;
 
 namespace Lib
 {
-    public class Arguments
+    /// <summary>
+    /// class Arguments.
+    /// 
+    /// 
+    /// </summary>
+    public class Arguments : IEnumerable<string>
     {
-        public const string DEFAULT_OPTION_CHAR = "/";
         protected readonly List<string> _values = new List<string>();
         protected List<string> _args;
-        protected CommandMap _map;
+        protected PropertyMap _map;
         public string this[int index] => index < _values.Count ? _values[index] : null;
+        public int Count => _values.Count;
         public bool HasValue => _values.Count > 0;
-        public bool HasOption(string key) => _map.GetValue<bool>(key);
-        public virtual List<string> Values => _values;
-        public string OptionCharacter { get; protected set; }
         [Command(@"?")]
         [Command("help")]
         [Detail("view help.")]
@@ -26,18 +32,15 @@ namespace Lib
         [Command]
         [Hidden]
         public bool DebugMode { get; set; }
-        protected Arguments(IEnumerable<string> args, string option) 
+        protected Arguments(IEnumerable<string> args) 
         {
-            OptionCharacter = option;
             Initialize();
             Reset(args);
-            if (DebugMode) PrintDebug();
-            if (Help) {
-                PrintHelp();
-                Environment.Exit(0);
-            }
+
+            PrintDebug(this);
+            if (Help) GoHelp();
         }
-        protected virtual void Initialize() => _map = new CommandMap(this);
+        protected virtual void Initialize() => _map = PropertyMap.Of(this);
         public virtual void Reset(IEnumerable<string> args)
         {
             _args = args?.ToList();
@@ -45,47 +48,62 @@ namespace Lib
             for (var i = 0; i < _args.Count; i++)
             {
                 var value = _args[i];
-                if (value.Length > 0 && value.Substring(0, 1) == OptionCharacter)
-                {
-                    value = value.ToLower();
-                    if (_map.IsList(value))
-                    {
-                        var (o, p) = _map[value];
-                        var list = p.GetValue(o) as IList ?? Activator.CreateInstance(p.PropertyType) as IList;
-                        var a = _args[++i];
-                        list.Add(value is string ? Convert.ChangeType(a, p.PropertyType.GetGenericArguments()[0]) : a);
-                        _map.SetValue(value, list);
-                    }
-                    else _map.SetValue(value, _map.WithNextValue(value) ? _args[++i] : "true");
-                }
+                var key = value.ToLower();
+                if (_map.ContainsKey(key)) foreach (var p in _map[key]) p.AddValue(p.Info.HasAttribute<CommandValueAttribute>() ? _args[++i] : "true");
                 else _values.Add(value);
             }
         }
         public virtual void Reset() => Reset(Environment.GetCommandLineArgs().Skip(1));
-        public virtual void PrintDebug() => Console.WriteLine(this);
-        public virtual void PrintHelp() => Console.WriteLine(_map);
-        public override string ToString() =>  string.Format("values : {0}, options : {1}", string.Join(",", _values), _map);
-
-        public static Arguments Load() => Load(DEFAULT_OPTION_CHAR);
-        public static Arguments Load(string option) => Load(Environment.GetCommandLineArgs().Skip(1), option);
-        public static Arguments Load(IEnumerable<string> args) => Load(args, DEFAULT_OPTION_CHAR);
-        public static Arguments Load(IEnumerable<string> args, string option) => new Arguments(args, option);
-        public static Arguments<T> Load<T>() => Load<T>(DEFAULT_OPTION_CHAR);
-        public static Arguments<T> Load<T>(string option) => Load<T>(Environment.GetCommandLineArgs().Skip(1), option);
-        public static Arguments<T> Load<T>(IEnumerable<string> args) => Load<T>(args, DEFAULT_OPTION_CHAR);
-        public static Arguments<T> Load<T>(IEnumerable<string> args, string option) => new Arguments<T>(args, option);
+        public void PrintDebug(object value) { if (DebugMode) Console.WriteLine(value); }
+        public void PrintDebug(string format, params object[] arg) { if (DebugMode) Console.WriteLine(format, arg); }
+        public void PrintHelp() => Console.WriteLine(ToHelp());
+        public void GoHelp()
+        {
+            PrintHelp();
+            Environment.Exit(0);
+        }
+        public virtual IEnumerator<string> GetEnumerator() => _values.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        public override string ToString() => string.Join(" ", _args);
+        public string ToHelp()
+        {
+            var s = new StringBuilder();
+            s.AppendLine(Path.GetFileName(Process.GetCurrentProcess().MainModule.FileName));
+            s.AppendLine();
+            s.AppendLine("[help]");
+            foreach (var o in _map
+                .Select(_ => _.Value.Instance)
+                .Distinct()
+                .SelectMany(_ => DetailAttribute.GetContents(_))
+                .Select(_ => "  " + _)) s.AppendLine(o);
+            s.AppendLine();
+            s.AppendLine("[option]");
+            var map = _map
+                .GroupBy(_ => _.Value.Info)
+                .Where(_ => !_.Key.HasAttribute<HiddenAttribute>())
+                .ToDictionary(_ => _.Key, _ => string.Join(" or ", _.Select(i => i.Key)));
+            var padding = map.Values.Max(_ => _.Length);
+            foreach (var o in map
+                .Select(_ => string.Format("  {0} : {1}",
+                _.Value.PadRight(padding), string.Concat(DetailAttribute.GetContents(_.Key))))) s.AppendLine(o);
+            return s.ToString();
+        }
+        public static Arguments Load() => Load(Environment.GetCommandLineArgs().Skip(1));
+        public static Arguments Load(IEnumerable<string> args) => new Arguments(args);
     }
+
     public class Arguments<T> : Arguments
     {
         T _options;
         public T Options => _options;
-        internal Arguments(IEnumerable<string> args, string option) : base(args, option) { }
+        internal Arguments(IEnumerable<string> args) : base(args) { }
         protected override void Initialize()
         {
             base.Initialize();
             _options = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
-            _map.Add(_options);
+            _map.Add(PropertyMap.Of(_options));
         }
+        public static new Arguments<T> Load() => Load(Environment.GetCommandLineArgs().Skip(1));
+        public static new Arguments<T> Load(IEnumerable<string> args) => new Arguments<T>(args);
     }
-
 }

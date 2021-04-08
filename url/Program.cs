@@ -12,8 +12,8 @@ namespace url
     {
         static void Main()
         {
-            var a = Arguments.Load<Options>();
-            foreach (var v in a.Values) Console.WriteLine(a.Options.Decode ? HttpUtility.UrlDecode(v) : HttpUtility.UrlEncode(v));
+            var a = Arguments<Options>.Load();
+            foreach (var v in a) Console.WriteLine(a.Options.Decode ? HttpUtility.UrlDecode(v) : HttpUtility.UrlEncode(v));
         }
         class Options
         {

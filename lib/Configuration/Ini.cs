@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using Lib.Reflection;
 
 namespace Lib.Configuration
 {
@@ -49,8 +50,8 @@ namespace Lib.Configuration
         {
             var type = typeof(T);
             var instance = (T)type.GetConstructor(new Type[] { }).Invoke(new object[] { });
-            var map = new PropertyMap(instance);
-            foreach (var m in map) try { map.SetValue(m.Key, ini[m.Key]); } catch { }
+            var map = PropertyMap.Of(instance);
+            foreach(var _ in map) try { _.Value.SetValue(ini[_.Key]); } catch { }
             return instance;
         }
     }

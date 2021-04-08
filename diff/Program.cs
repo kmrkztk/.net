@@ -13,8 +13,8 @@ namespace diff
     {
         static void Main()
         {
-            var a = Arguments.Load<Options>();
-            if (a.Values.Count < 2) throw new ArgumentException();
+            var a = Arguments<Options>.Load();
+            if (a.Count < 2) a.GoHelp();
             IEnumerable<string> read(string fn)
             {
                 using (var f = new FileStream(fn, FileMode.Open))

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Lib.Reflection;
 
 namespace Lib.Json
 {
@@ -65,8 +66,8 @@ namespace Lib.Json
         {
             if (type == this.GetType()) return this;
             var instance = type.GetConstructor(new Type[] { }).Invoke(new object[] { });
-            var map = new PropertyMap(instance);
-            foreach (var k in map.Keys) map.SetValue(k, this[k].Cast(map[k].Property.PropertyType));
+            var map = PropertyMap.Of(instance);
+            foreach (var k in map.Keys) foreach(var p in map[k]) p.SetValue(this[k].Cast(p.PropertyType));
             return instance;
         }
         public IEnumerable<Json> Find(params string[] keys)

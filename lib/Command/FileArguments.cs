@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Lib.Reflection;
 
 namespace Lib
 {
@@ -41,11 +42,13 @@ namespace Lib
         public virtual FileAccess Access { get; set; } = FileAccess.Read;
         public virtual FileShare Share { get; set; } = FileShare.ReadWrite;
         public virtual bool DefaultAllFiles => false;
-        public override List<string> Values => base.Values.Count > 0 ? base.Values : DefaultAllFiles ? new List<string> { "*" } : base.Values;
-        internal FileArguments(IEnumerable<string> args, string option) : base(args, option) { }
+        internal FileArguments(IEnumerable<string> args) : base(args) { }
+        public override IEnumerator<string> GetEnumerator() =>
+            HasValue && DefaultAllFiles ?
+            new List<string> { "*" }.GetEnumerator() : base._values.GetEnumerator();
         public virtual IEnumerable<FileSystemInfo> GetFileSystems()
         {
-            foreach (var v in this.Values)
+            foreach (var v in this)
             {
                 var s = v.Split('\\');
                 var d = string.Join("\\", s.Take(s.Length - 1));
@@ -87,25 +90,21 @@ namespace Lib
             foreach (var r in GetReaders()) while ((line = r.ReadLine()) != null) yield return line;
         }
 
-        public new static FileArguments Load() => Load(DEFAULT_OPTION_CHAR);
-        public new static FileArguments Load(string option) => Load(Environment.GetCommandLineArgs().Skip(1), option);
-        public new static FileArguments Load(IEnumerable<string> args) => Load(args, DEFAULT_OPTION_CHAR);
-        public new static FileArguments Load(IEnumerable<string> args, string option) => new FileArguments(args, option);
-        public new static FileArguments<T> Load<T>() => Load<T>(DEFAULT_OPTION_CHAR);
-        public new static FileArguments<T> Load<T>(string option) => Load<T>(Environment.GetCommandLineArgs().Skip(1), option);
-        public new static FileArguments<T> Load<T>(IEnumerable<string> args) => Load<T>(args, DEFAULT_OPTION_CHAR);
-        public new static FileArguments<T> Load<T>(IEnumerable<string> args, string option) => new FileArguments<T>(args, option);
+        public new static FileArguments Load() => Load(Environment.GetCommandLineArgs().Skip(1));
+        public new static FileArguments Load(IEnumerable<string> args) => new FileArguments(args);
     }
     public class FileArguments<T> : FileArguments
     {
         T _options;
         public T Options => _options;
-        internal FileArguments(IEnumerable<string> args, string option) : base(args, option) { }
+        internal FileArguments(IEnumerable<string> args) : base(args) { }
         protected override void Initialize()
         {
             base.Initialize();
             _options = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
-            _map.Add(_options);
+            _map.Add(PropertyMap.Of(_options));
         }
+        public new static FileArguments<T> Load() => Load(Environment.GetCommandLineArgs().Skip(1));
+        public new static FileArguments<T> Load(IEnumerable<string> args) => new FileArguments<T>(args);
     }
 }

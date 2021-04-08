@@ -12,7 +12,7 @@ namespace ls
     {
         static void Main()
         {
-            var a = FileArguments.Load<Options>();
+            var a = FileArguments<Options>.Load();
             foreach (var d in a.GetFileSystems()
                 .Where(_ => a.Options.DisplayDirectory || (_.Attributes & FileAttributes.Directory) == 0)
                 .Select(_ => new Display(a.Options, _))) Console.WriteLine(d);

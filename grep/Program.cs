@@ -13,7 +13,7 @@ namespace grep
     {
         static void Main()
         {
-            var a = FileArguments.Load<Options>();
+            var a = FileArguments<Options>.Load();
             var r = a.Options.Regex;
             var startwith = a.Options.StartWithRegex;
             var format = "{0}";

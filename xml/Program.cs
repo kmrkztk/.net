@@ -13,7 +13,7 @@ namespace xml
     {
         static void Main()
         {
-            var a = FileArguments.Load<Options>();
+            var a = FileArguments<Options>.Load();
             foreach (var xml in a.GetReaders()
                 .Select(_ =>
                 {

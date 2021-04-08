@@ -14,7 +14,7 @@ namespace json
     {
         static void Main()
         {
-            var a = FileArguments.Load<Options>();
+            var a = FileArguments<Options>.Load();
             foreach (var j in a.GetReaders()
                 .Select(_ =>
                 {

@@ -14,7 +14,7 @@ namespace base64
     {
         static void Main()
         {
-            var a = FileArguments.Load<Options>();
+            var a = FileArguments<Options>.Load();
             if (a.Options.Decode)
             {
                 using (var o = a.Options.GetOutputStream())

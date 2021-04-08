@@ -11,7 +11,7 @@ namespace replace
     {
         static void Main()
         {
-            var a = FileArguments.Load<Options>();
+            var a = FileArguments<Options>.Load();
             foreach (var reader in a.GetReaders())
             {
                 Console.WriteLine(reader.ReadToEnd().Replace(a.Options.Pattern, a.Options.Replace));

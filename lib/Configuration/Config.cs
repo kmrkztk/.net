@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Lib.Reflection;
 
 namespace Lib.Configuration
 {
@@ -15,13 +16,13 @@ namespace Lib.Configuration
         {
             var settings = ConfigurationManager.AppSettings;
             var instance = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
-            var map = new PropertyMap(instance);
-            foreach (var k in settings.AllKeys) try { map.SetValue(k, settings[k]); } catch { }
+            var map = PropertyMap.Of(instance);
+            foreach (var k in settings.AllKeys) foreach(var _ in map[k]) try { _.SetValue(settings[k]); } catch { }
             return instance;
         }
         public static void Watch(object instance)
         {
-            var map = new PropertyMap(instance);
+            var map = PropertyMap.Of(instance);
             var fi = new FileInfo(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).FilePath);
             if (_watch != null) Release();
             _watch = new FileSystemWatcher(fi.DirectoryName, fi.Name);
@@ -31,11 +32,9 @@ namespace Lib.Configuration
                 {
                     ConfigurationManager.RefreshSection("appSettings");
                     var settings = ConfigurationManager.AppSettings;
-                    foreach (var k in settings.AllKeys) try { map.SetValue(k, settings[k]); } catch { }
+                    foreach (var k in settings.AllKeys) foreach (var _ in map[k]) try { _.SetValue(settings[k]); } catch { }
                 }
-                catch
-                {
-                }
+                catch { }
             };
             _watch.EnableRaisingEvents = true;
         }
