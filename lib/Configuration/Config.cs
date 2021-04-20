@@ -17,7 +17,8 @@ namespace Lib.Configuration
             var settings = ConfigurationManager.AppSettings;
             var instance = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
             var map = PropertyMap.Of(instance);
-            foreach (var k in settings.AllKeys) foreach(var _ in map[k]) try { _.SetValue(settings[k]); } catch { }
+            foreach (var k in settings.AllKeys) 
+                try { map.SetValue(k, settings[k]); } catch { }
             return instance;
         }
         public static void Watch(object instance)
@@ -32,7 +33,8 @@ namespace Lib.Configuration
                 {
                     ConfigurationManager.RefreshSection("appSettings");
                     var settings = ConfigurationManager.AppSettings;
-                    foreach (var k in settings.AllKeys) foreach (var _ in map[k]) try { _.SetValue(settings[k]); } catch { }
+                    foreach (var k in settings.AllKeys)
+                        try { map.SetValue(k, settings[k]); } catch { }
                 }
                 catch { }
             };
