@@ -14,10 +14,10 @@ namespace Lib.Reflection
         public PropertyInfo Info { get; private set; }
         public Type PropertyType => Info.PropertyType;
         public bool IsList => PropertyType.IsGenericType && PropertyType.GetGenericTypeDefinition() == typeof(List<>);
-        public Property(object target, PropertyInfo pi)
+        public Property(object instance, PropertyInfo pi)
         {
-            Instance = target ?? throw new ArgumentNullException("target");
-            Info = pi ?? throw new ArgumentNullException("pi");
+            Instance = instance ?? throw new ArgumentNullException(nameof(instance));
+            Info = pi ?? throw new ArgumentNullException(nameof(pi));
         }
         public object GetValue() => Info.GetValue(Instance);
         public void SetValue(object value) => Info.SetValue(Instance, ConvertType(value, PropertyType));
@@ -31,7 +31,11 @@ namespace Lib.Reflection
             }
             else SetValue(value);
         }
-        protected object ConvertType(object value, Type type) => value.GetType() == type ? value : Convert.ChangeType(value, type);
+        protected static object ConvertType(object value, Type type) => value.GetType() == type ? value : Convert.ChangeType(value, type);
         public override string ToString() => string.Format("{0}.{1} = {2}", Instance.GetType().Name, Info.Name, Info.GetValue(Instance));
+
+        public static IEnumerable<Property> GetProperties(object instance) => instance.GetType()
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Select(_ => new Property(instance, _));
     }
 }

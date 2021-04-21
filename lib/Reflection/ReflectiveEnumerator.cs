@@ -15,7 +15,7 @@ namespace Lib.Reflection
         public static IEnumerable<Type> GetEnumerableOfType<T>(Assembly assembly) => GetEnumerableOfType(typeof(T), assembly);
         public static IEnumerable<Type> GetEnumerableOfType<T>(Type[] types) => GetEnumerableOfType(typeof(T), types);
         public static IEnumerable<Type> GetEnumerableOfType(this Type type) => GetEnumerableOfType(type, type.Assembly);
-        public static IEnumerable<Type> GetEnumerableOfType(this Type type, Assembly assembly) => GetEnumerableOfType(type, assembly?.GetTypes() ?? new Type[] { });
+        public static IEnumerable<Type> GetEnumerableOfType(this Type type, Assembly assembly) => GetEnumerableOfType(type, assembly?.GetTypes() ?? Array.Empty<Type>());
         public static IEnumerable<Type> GetEnumerableOfType(this Type type, Type[] types) => type.IsInterface ?
                 types.Where(_ => _.GetInterfaces().Any(t => t == type)) :
                 types.Where(_ => _.IsSubclassOf(type) && !_.IsAbstract);

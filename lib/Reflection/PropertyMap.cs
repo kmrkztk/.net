@@ -10,7 +10,7 @@ namespace Lib.Reflection
 {
     public class PropertyMap : MultiMap<string, Property>
     {
-        public static PropertyMap Of(object instance) => new PropertyMap(
+        public static PropertyMap Of(object instance) => new(
             instance.GetType()
                 .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                 .SelectMany(_ =>

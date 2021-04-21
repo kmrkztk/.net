@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using Lib.Collections;
 using Lib.Reflection;
+using Lib.Validation;
 
 namespace Lib
 {
@@ -19,7 +20,7 @@ namespace Lib
     /// </summary>
     public class Arguments : IEnumerable<string>
     {
-        protected readonly List<string> _values = new List<string>();
+        protected readonly List<string> _values = new();
         protected List<string> _args;
         protected PropertyMap _map;
         public string this[int index] => index < _values.Count ? _values[index] : null;
@@ -89,7 +90,7 @@ namespace Lib
             return s.ToString();
         }
         public static Arguments Load() => Load(Environment.GetCommandLineArgs().Skip(1));
-        public static Arguments Load(IEnumerable<string> args) => new Arguments(args);
+        public static Arguments Load(IEnumerable<string> args) => new(args);
     }
 
     public class Arguments<T> : Arguments
@@ -100,10 +101,17 @@ namespace Lib
         protected override void Initialize()
         {
             base.Initialize();
-            _options = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
+            _options = (T)typeof(T).GetConstructor(Array.Empty<Type>()).Invoke(Array.Empty<object>());
             _map.Add(PropertyMap.Of(_options));
+            var messages = Validator.GetMessages(_options);
+            if (messages.Any())
+            {
+                foreach (var m in messages) Console.WriteLine(m.Message);
+                ConsoleEx.Pause();
+                GoHelp();
+            }
         }
         public static new Arguments<T> Load() => Load(Environment.GetCommandLineArgs().Skip(1));
-        public static new Arguments<T> Load(IEnumerable<string> args) => new Arguments<T>(args);
+        public static new Arguments<T> Load(IEnumerable<string> args) => new(args);
     }
 }
