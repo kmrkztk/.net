@@ -1,361 +1,122 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{630BFC3E-9D26-490C-9CC7-055A08BDCB9D}</ProjectGuid>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>life</RootNamespace>
-    <AssemblyName>life</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>..\bin\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <Prefer32Bit>true</Prefer32Bit>
+    <OutputPath>..\bin</OutputPath>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Design" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Controls\Components\Components.cs" />
-    <Compile Include="Controls\Components\DrawAlign.cs">
+    <Compile Update="Controls\Components\DrawAlign.cs" />
+    <Compile Update="Controls\Drawers\FlameDrawer.cs" />
+    <Compile Update="Controls\Tools\Edit.cs" />
+    <Compile Update="Controls\Tools\Tool.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Components\DrawAlign.Designer.cs">
-      <DependentUpon>DrawAlign.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Components\SizeDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\Components\SizeDialog.Designer.cs">
-      <DependentUpon>SizeDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Drawers\FlameDrawer.cs">
+    <Compile Update="Controls\Tools\Eraser.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Tools\Edit.cs">
+    <Compile Update="Controls\Tools\PatternStamp.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Tools\Edit.Designer.cs">
-      <DependentUpon>Edit.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Tools\Tools.cs" />
-    <Compile Include="Controls\Tools\Tool.cs">
+    <Compile Update="Controls\Tools\Stamp.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Tools\Tool.Designer.cs">
-      <DependentUpon>Tool.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Tools\Eraser.cs">
+    <Compile Update="Controls\Components\MapDirection.cs" />
+    <Compile Update="Controls\Components\MapFile.cs" />
+    <Compile Update="Controls\Components\Component.cs" />
+    <Compile Update="Controls\Components\LifeEngine.cs" />
+    <Compile Update="Controls\MapView.cs" />
+    <Compile Update="Controls\Components\DrawPosition.cs" />
+    <Compile Update="Controls\Components\DrawScale.cs" />
+    <Compile Update="Controls\PatternList.cs" />
+    <Compile Update="Controls\Tools\Pen.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Tools\PatternStamp.cs">
+    <Compile Update="Controls\Drawers\Shadow.cs" />
+    <Compile Update="Controls\Drawers\MapDrawerFull.cs" />
+    <Compile Update="Controls\Components\MapResize.cs" />
+    <Compile Update="Controls\Menus\MenuSize.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Tools\Stamp.cs">
+    <Compile Update="Controls\Menus\MenuPen.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Components\MapDirection.cs">
+    <Compile Update="Controls\Menus\MenuEraser1.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Components\MapDirection.Designer.cs">
-      <DependentUpon>MapDirection.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Components\MapFile.cs">
+    <Compile Update="Controls\Menus\MenuEraser10.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Components\MapFile.Designer.cs">
-      <DependentUpon>MapFile.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Components\Component.cs">
+    <Compile Update="Controls\Menus\MenuPen20.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Components\LifeEngine.cs">
+    <Compile Update="Controls\Menus\MenuPen10.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Components\LifeEngine.Designer.cs">
-      <DependentUpon>LifeEngine.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\MapView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\MapView.Designer.cs">
-      <DependentUpon>MapView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\MapPreview.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\MapPreview.Designer.cs">
-      <DependentUpon>MapPreview.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Components\DrawPosition.cs">
+    <Compile Update="Controls\Menus\MenuEraser20.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Components\DrawPosition.Designer.cs">
-      <DependentUpon>DrawPosition.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Components\DrawScale.cs">
+    <Compile Update="Controls\Menus\MenuEraser5.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Components\DrawScale.Designer.cs">
-      <DependentUpon>DrawScale.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\PatternList.cs">
+    <Compile Update="Controls\Menus\MenuPen5.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\PatternListDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\PatternListDialog.Designer.cs">
-      <DependentUpon>PatternListDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Tools\Pen.cs">
+    <Compile Update="Controls\Menus\MenuPen50.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Drawers\Shadow.cs">
+    <Compile Update="Controls\Menus\MenuPen1.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Drawers\MapDrawerFull.cs">
+    <Compile Update="Controls\Menus\MenuErasers.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Components\MapResize.cs">
+    <Compile Update="Controls\Menus\MenuPens.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Components\MapResize.Designer.cs">
-      <DependentUpon>MapResize.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Drawers\Shadow.Designer.cs">
-      <DependentUpon>Shadow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Menus\MenuSize.cs">
+    <Compile Update="Controls\LifeAnimator.cs" />
+    <Compile Update="Controls\Menus\MenuPatterns.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Menus\MenuPen.cs">
+    <Compile Update="Controls\Menus\MenuOpen.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Menus\MenuEraser1.cs">
+    <Compile Update="Controls\Menus\Menu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Menus\MenuEraser10.cs">
+    <Compile Update="Controls\Menus\MenuClear.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Menus\MenuPen20.cs">
+    <Compile Update="Controls\Menus\MenuEdit.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Menus\MenuPen10.cs">
+    <Compile Update="Controls\Menus\MenuFile.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Menus\MenuEraser20.cs">
+    <Compile Update="Controls\Menus\MenuItem.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Menus\MenuEraser5.cs">
+    <Compile Update="Controls\MapData.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Menus\MenuPen5.cs">
+    <Compile Update="Controls\Drawers\MapDrawer.cs" />
+    <Compile Update="Controls\LifeCalculator.cs" />
+    <Compile Update="Controls\Menus\MenuRun.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Menus\MenuPen50.cs">
+    <Compile Update="Controls\Menus\MenuSave.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Menus\MenuPen1.cs">
+    <Compile Update="Controls\Menus\MenuSaveAs.cs">
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\Menus\MenuErasers.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\Menus\MenuPens.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\LifeAnimator.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\Menus\MenuPatterns.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\Menus\MenuOpen.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\Menus\Menu.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\Menus\Menu.Designer.cs">
-      <DependentUpon>Menu.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Menus\MenuClear.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\Menus\MenuEdit.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\Menus\MenuFile.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\Menus\MenuItem.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\Menus\MenuItem.Designer.cs">
-      <DependentUpon>MenuItem.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\MapData.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\MapData.Designer.cs">
-      <DependentUpon>MapData.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Drawers\MapDrawer.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\LifeCalculator.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\Menus\MenuRun.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\Menus\MenuSave.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\Menus\MenuSaveAs.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="DrawArea.cs" />
-    <Compile Include="IO\IMapFileExtension.cs" />
-    <Compile Include="Drawer.cs" />
-    <Compile Include="Calculator.cs" />
-    <Compile Include="IO\MapFileCells.cs" />
-    <Compile Include="IO\MapFileInfo.cs" />
-    <Compile Include="IO\MapFileRle.cs" />
-    <Compile Include="Maps.cs" />
-    <Compile Include="Patterns.cs" />
-    <Compile Include="Main.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Main.Designer.cs">
-      <DependentUpon>Main.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Map.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Controls\Components\DrawPosition.resx">
-      <DependentUpon>DrawPosition.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\Components\SizeDialog.resx">
-      <DependentUpon>SizeDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\Tools\Tool.resx">
-      <DependentUpon>Tool.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\Components\MapDirection.resx">
-      <DependentUpon>MapDirection.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\Components\MapFile.resx">
-      <DependentUpon>MapFile.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\Components\LifeEngine.resx">
-      <DependentUpon>LifeEngine.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\MapView.resx">
-      <DependentUpon>MapView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\MapPreview.resx">
-      <DependentUpon>MapPreview.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\Components\DrawScale.resx">
-      <DependentUpon>DrawScale.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\MapData.resx">
-      <DependentUpon>MapData.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\PatternListDialog.resx">
-      <DependentUpon>PatternListDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\Components\MapResize.resx">
-      <DependentUpon>MapResize.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\Drawers\Shadow.resx">
-      <DependentUpon>Shadow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\Menus\Menu.resx">
-      <DependentUpon>Menu.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\Menus\MenuEdit.resx">
-      <DependentUpon>MenuEdit.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\Menus\MenuFile.resx">
-      <DependentUpon>MenuFile.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\Menus\MenuOpen.resx">
-      <DependentUpon>MenuOpen.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\Menus\MenuErasers.resx">
-      <DependentUpon>MenuErasers.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\Menus\MenuPens.resx">
-      <DependentUpon>MenuPens.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Main.resx">
-      <DependentUpon>Main.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <EmbeddedResource Include="patterns\101.rle" />
     <EmbeddedResource Include="patterns\104p177.rle" />
@@ -2724,32 +2485,18 @@
     <EmbeddedResource Include="patterns\zpentomino.rle" />
     <EmbeddedResource Include="patterns\zquadloaf.rle" />
     <EmbeddedResource Include="patterns\zweiback.rle" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\lib.Windows\lib.Windows.csproj">
-      <Project>{f4520b16-8326-49d3-b04c-be35e98384be}</Project>
-      <Name>lib.Windows</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\lib\lib.csproj">
-      <Project>{e6d23f30-45b9-4d77-81fe-9888c2a8b51e}</Project>
-      <Name>lib</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\lib.Windows\lib.Windows.csproj" />
+    <ProjectReference Include="..\lib\lib.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
+    <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
+  </ItemGroup>
 </Project>

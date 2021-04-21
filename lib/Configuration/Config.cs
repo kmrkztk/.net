@@ -9,6 +9,7 @@ using Lib.Reflection;
 
 namespace Lib.Configuration
 {
+    /*
     public static class Config
     {
         static FileSystemWatcher _watch;
@@ -47,4 +48,5 @@ namespace Lib.Configuration
             _watch = null;
         }
     }
+    */
 }

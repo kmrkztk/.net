@@ -30,21 +30,19 @@ namespace xml
         }
         static void Format(XmlNode xml, FileArguments<Options> a)
         {
-            using (var ms = new MemoryStream())
-            using (var xw = new XmlTextWriter(ms, Encoding.UTF8)
+            using var ms = new MemoryStream();
+            using var xw = new XmlTextWriter(ms, Encoding.UTF8)
             {
                 Formatting = a.Options.NoFormat ? Formatting.None : Formatting.Indented,
                 Indentation = a.Options.Indent,
                 IndentChar = a.Options.IndentChar,
-            })
-            using (var sr = new StreamReader(ms))
-            {
-                xml.WriteContentTo(xw);
-                xw.Flush();
-                ms.Flush();
-                ms.Position = 0;
-                Console.WriteLine(sr.ReadToEnd());
-            }
+            };
+            using var sr = new StreamReader(ms);
+            xml.WriteContentTo(xw);
+            xw.Flush();
+            ms.Flush();
+            ms.Position = 0;
+            Console.WriteLine(sr.ReadToEnd());
         }
         static void ShowTag(XmlDocument xml, FileArguments<Options> a)
         {
