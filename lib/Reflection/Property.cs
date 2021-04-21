@@ -19,13 +19,13 @@ namespace Lib.Reflection
             Instance = target ?? throw new ArgumentNullException("target");
             Info = pi ?? throw new ArgumentNullException("pi");
         }
-        public T GetValue<T>() => (T)Info.GetValue(Instance);
+        public object GetValue() => Info.GetValue(Instance);
         public void SetValue(object value) => Info.SetValue(Instance, ConvertType(value, PropertyType));
         public void AddValue(object value)
         {
             if (IsList)
             {
-                var list = GetValue<IList>() ?? Activator.CreateInstance(PropertyType) as IList;
+                var list = (GetValue() as IList) ?? Activator.CreateInstance(PropertyType) as IList;
                 list.Add(ConvertType(value, PropertyType.GetGenericArguments()[0]));
                 SetValue(list);
             }
