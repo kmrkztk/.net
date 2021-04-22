@@ -8,7 +8,7 @@ using Lib.Reflection;
 namespace Lib.Validation
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class RequiredAttribute : ValidationAttribute
+    public class RequiredValidationAttribute : ValidationAttribute
     {
         public override string DefaultMessage => "'{name}' is required.";
         public override bool HasError(Property property, ValidationContext context) 

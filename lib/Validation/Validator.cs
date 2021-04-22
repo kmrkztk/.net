@@ -10,7 +10,14 @@ namespace Lib.Validation
 {
     public static class Validator
     {
-        public static void Validate() { }
+        public static bool HasError(object instance)
+        {
+            var context = new ValidationContext(instance);
+            return context.Properties
+                .SelectMany(_ => _.Info.GetCustomAttributes<ValidationAttribute>()
+                .Select(a => (_, a)))
+                .Any(_ => _.a.HasError(_._, context));
+        }
         public static IEnumerable<ValidationMessage> GetMessages(object instance) 
         {
             var context = new ValidationContext(instance);
@@ -18,11 +25,7 @@ namespace Lib.Validation
                 .SelectMany(_ => _.Info.GetCustomAttributes<ValidationAttribute>()
                 .Select(a => (_, a)))
                 .OrderBy(_ => _.a.Order)
-                .Where(_ => _.a.HasError(_._, context))
-                .Select(_ => new ValidationMessage() { 
-                    Property = _._, 
-                    Message = _.a.GetMessage(_._, context) 
-                });
+                .SelectMany(_ => _.a.GetMessages(_._, context));
         }
     }
 }

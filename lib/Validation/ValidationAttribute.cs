@@ -19,6 +19,13 @@ namespace Lib.Validation
             => (Message ?? DefaultMessage)?
             .Replace("{name}", property.Info.Name)
             .Replace("{value}", property.GetValue()?.ToString());
-
+        public virtual IEnumerable<ValidationMessage> GetMessages(Property property, ValidationContext context)
+        {
+            if (HasError(property, context)) yield return new()
+            {
+                Property = property,
+                Message = GetMessage(property, context),
+            };
+        }
     }
 }
