@@ -20,6 +20,6 @@ namespace Lib.Validation
         public override bool HasError(Property property, ValidationContext context)
            => Compare(Parse(property.GetValue()), Parse(context.GetPropertyValue(Name)));
         bool Compare(decimal d1, decimal d2) => Equal ? d1 > d2 : d1 >= d2;
-        decimal Parse(object value) => Convert.ToDecimal(value);
+        static decimal Parse(object value) => Convert.ToDecimal(value);
     }
 }

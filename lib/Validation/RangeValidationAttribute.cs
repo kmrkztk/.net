@@ -23,6 +23,6 @@ namespace Lib.Validation
             .Replace("{max}", Max.ToString());
         public override bool HasError(Property property, ValidationContext context) => Compare(Parse(property.GetValue()));
         bool Compare(object value) => Min.CompareTo(value) > 0 || Max.CompareTo(value) < 0;
-        double Parse(object value) => value is string s ? double.Parse(s) : Convert.ToDouble(value);
+        static double Parse(object value) => value is string s ? double.Parse(s) : Convert.ToDouble(value);
     }
 }
