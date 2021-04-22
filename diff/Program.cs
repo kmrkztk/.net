@@ -15,11 +15,11 @@ namespace diff
         {
             var a = Arguments<Options>.Load();
             if (a.Count < 2) a.GoHelp();
-            IEnumerable<string> read(string fn)
+            static IEnumerable<string> read(string fn)
             {
-                using (var f = new FileStream(fn, FileMode.Open))
-                using (var r = new StreamReader(f))
-                    while (!r.EndOfStream) yield return r.ReadLine();
+                using var f = new FileStream(fn, FileMode.Open);
+                using var r = new StreamReader(f);
+                while (!r.EndOfStream) yield return r.ReadLine();
             }
 
             var diff = read(a[0]).Diff(read(a[1]), a.Options.Algorithm);
