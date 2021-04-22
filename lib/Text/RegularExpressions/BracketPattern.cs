@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace lib.Text.RegularExpressions
+namespace Lib.Text.RegularExpressions
 {
     public class BracketPattern : RegexPattern
     {

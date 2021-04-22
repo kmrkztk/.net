@@ -5,30 +5,45 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 
-namespace lib.Text.RegularExpressions
+namespace Lib.Text.RegularExpressions
 {
     public class RegexPattern
     {
-        public static RegexPattern Empty => new();
-        public static RegexPattern Any => new(MetaCharacters.Any);
-        public static BracketPattern LargeAlphabets => new("A", "Z");
-        public static BracketPattern SmallAlphabets => new("a", "z");
-        public static BracketPattern Alphabets => LargeAlphabets + SmallAlphabets;
-        public static BracketPattern Numerics => new(@"\d");
-        public static BracketPattern AlphaNumerics => Alphabets + Numerics;
-        public static BracketPattern Symbols => 
+        public static RegexPattern Empty                    => new();
+        public static RegexPattern Any                      => new(MetaCharacters.Any);
+        public static BracketPattern LargeAlphabets         => new("A", "Z");
+        public static BracketPattern SmallAlphabets         => new("a", "z");
+        public static BracketPattern Alphabets              => LargeAlphabets + SmallAlphabets;
+        public static BracketPattern Numerics               => new(@"\d");
+        public static BracketPattern AlphaNumerics          => Alphabets + Numerics;
+        public static BracketPattern Symbols                => 
             new BracketPattern(" ", "/") + 
             new BracketPattern(":", "@") +
             new BracketPattern(@"\[", "~");
-        public static BracketPattern HalfChars => new(" ", "~");
-        public static BracketPattern FullLargeAlphabets => new("Ａ", "Ｚ");
-        public static BracketPattern FullSmallAlphabets => new("ａ", "ｚ");
-        public static BracketPattern FullAlphabets => FullLargeAlphabets + FullSmallAlphabets;
-        public static BracketPattern FullNumerics => new("０", "９");
-        public static BracketPattern FullAlphaNumerics => FullAlphabets + FullNumerics;
-        public static BracketPattern HalfKana => new("ｦ", "ﾟ");
-        public static BracketPattern FullKana => new("ァ", "ヴ");
-        public static BracketPattern Kana => HalfKana + FullKana;
+        public static BracketPattern HalfChars              => new(" ", "~");
+        public static BracketPattern FullLargeAlphabets     => new("Ａ", "Ｚ");
+        public static BracketPattern FullSmallAlphabets     => new("ａ", "ｚ");
+        public static BracketPattern FullAlphabets          => FullLargeAlphabets + FullSmallAlphabets;
+        public static BracketPattern FullNumerics           => new("０", "９");
+        public static BracketPattern FullAlphaNumerics      => FullAlphabets + FullNumerics;
+        public static BracketPattern HalfKana               => new("ｦ", "ﾟ");
+        public static BracketPattern FullKana               => new("ァ", "ヴ");
+        public static BracketPattern Kana                   => HalfKana + FullKana;
+        public static RegexPattern OnlyLargeAlphabets       => LargeAlphabets     .ZeroOrMore().LineOf();
+        public static RegexPattern OnlySmallAlphabets       => SmallAlphabets     .ZeroOrMore().LineOf();
+        public static RegexPattern OnlyAlphabets            => Alphabets          .ZeroOrMore().LineOf();
+        public static RegexPattern OnlyNumerics             => Numerics           .ZeroOrMore().LineOf();
+        public static RegexPattern OnlyAlphaNumerics        => AlphaNumerics      .ZeroOrMore().LineOf();
+        public static RegexPattern OnlySymbols              => Symbols            .ZeroOrMore().LineOf();
+        public static RegexPattern OnlyHalfChars            => HalfChars          .ZeroOrMore().LineOf();
+        public static RegexPattern OnlyFullLargeAlphabets   => FullLargeAlphabets .ZeroOrMore().LineOf();
+        public static RegexPattern OnlyFullSmallAlphabets   => FullSmallAlphabets .ZeroOrMore().LineOf();
+        public static RegexPattern OnlyFullAlphabets        => FullAlphabets      .ZeroOrMore().LineOf();
+        public static RegexPattern OnlyFullNumerics         => FullNumerics       .ZeroOrMore().LineOf();
+        public static RegexPattern OnlyFullAlphaNumerics    => FullAlphaNumerics  .ZeroOrMore().LineOf();
+        public static RegexPattern OnlyHalfKana             => HalfKana           .ZeroOrMore().LineOf();
+        public static RegexPattern OnlyFullKana             => FullKana           .ZeroOrMore().LineOf();
+        public static RegexPattern OnlyKana                 => Kana               .ZeroOrMore().LineOf();
 
         readonly protected string _value;
         public virtual string Value => _value;
@@ -45,7 +60,6 @@ namespace lib.Text.RegularExpressions
         public RegexPattern ZeroOrOne() => Append(MetaCharacters.ZeroOrOne);
         public RegexPattern ZeroOrMore() => Append(MetaCharacters.ZeroOrMore);
         public RegexPattern OneOrMore() => Append(MetaCharacters.OneOrMore);
-        public RegexPattern Only() => Bracket().ZeroOrMore().LineOf();
         public RegexPattern Range(int length) => Append("{" + length + ",}");
 
         public override string ToString() => Value;

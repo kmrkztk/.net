@@ -8,6 +8,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Reflection;
 using Lib;
+using Lib.Text.RegularExpressions;
+
 
 namespace hoge
 {
@@ -17,8 +19,10 @@ namespace hoge
         {
             try
             {
-
-
+                Console.WriteLine(RegexPattern.OnlyAlphabets);
+                Console.WriteLine(RegexPattern.Alphabets + RegexPattern.Numerics + RegexPattern.FullAlphabets + RegexPattern.FullNumerics);
+                Console.WriteLine(RegexPattern.OnlyAlphabets | RegexPattern.OnlyKana);
+                
             }
             finally
             {
