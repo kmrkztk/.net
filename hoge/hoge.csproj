@@ -11,9 +11,7 @@
     <OutputPath>..\bin</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\lib.Windows\lib.Windows.csproj" />
     <ProjectReference Include="..\lib\lib.csproj" />
-    <ProjectReference Include="..\life\life.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
