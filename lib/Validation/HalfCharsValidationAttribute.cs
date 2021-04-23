@@ -10,9 +10,9 @@ using Lib.Text.RegularExpressions;
 namespace Lib.Validation
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class AlphabetValidationAttribute : RegexMatchValidationAttribute
+    public class HalfCharsValidationAttribute : RegexMatchValidationAttribute
     {
         public override string DefaultMessage => "'{name}' is only kana.";
-        public AlphabetValidationAttribute() : base(RegexPattern.OnlyAlphabets) { }
+        public HalfCharsValidationAttribute() : base(RegexPattern.OnlyHalf) { }
     }
 }

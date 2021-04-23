@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Lib.Reflection;
+using Lib.Text.RegularExpressions;
 
 namespace Lib.Validation
 {
@@ -12,6 +13,6 @@ namespace Lib.Validation
     public class FullKanaValidationAttribute : RegexMatchValidationAttribute
     {
         public override string DefaultMessage => "'{name}' is only kana.";
-        public FullKanaValidationAttribute() : base(Only(FullKanaPattern)) { }
+        public FullKanaValidationAttribute() : base(RegexPattern.OnlyFullKana) { }
     }
 }

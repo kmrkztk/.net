@@ -12,32 +12,33 @@ namespace Lib.Text.RegularExpressions
         public static RegexPattern Empty                    => new();
         public static RegexPattern Of(string pattern)       => new(pattern);
         public static RegexPattern Of(char pattern)         => new(pattern);
-        public static RegexPattern Any                      => new(MetaCharacters.Any);
-        public static RegexPattern LargeAlphabets           => new BracketPattern("A", "Z");
-        public static RegexPattern SmallAlphabets           => new BracketPattern("a", "z");
+        public static RegexPattern Of(string p1, string p2) => new BracketPattern(p1, p2);
+        public static RegexPattern InBracket(string pattern) => new BracketPattern(pattern);
+        public static RegexPattern Or(params string[] patterns) => new SubExpressionPattern(patterns);
+        public static RegexPattern Any                      => Of(MetaCharacters.Any);
+        public static RegexPattern LargeAlphabets           => Of("A", "Z");
+        public static RegexPattern SmallAlphabets           => Of("a", "z");
         public static RegexPattern Alphabets                => LargeAlphabets & SmallAlphabets;
-        public static RegexPattern Numerics                 => new BracketPattern(@"\d");
+        public static RegexPattern Numerics                 => Of(@"\d");
         public static RegexPattern AlphaNumerics            => Alphabets & Numerics;
-        public static RegexPattern Symbols                  => 
-            new BracketPattern(" ", "/") & 
-            new BracketPattern(":", "@") &
-            new BracketPattern(@"\[", "~");
-        public static RegexPattern HalfChars                => new BracketPattern(" ", "~");
-        public static RegexPattern FullLargeAlphabets       => new BracketPattern("Ａ", "Ｚ");
-        public static RegexPattern FullSmallAlphabets       => new BracketPattern("ａ", "ｚ");
+        public static RegexPattern Symbols                  => Of(" ", "/") & Of(":", "@") & Of(@"\[", "~");
+        public static RegexPattern Half                     => Of(" ", "~");
+        public static RegexPattern FullLargeAlphabets       => Of("Ａ", "Ｚ");
+        public static RegexPattern FullSmallAlphabets       => Of("ａ", "ｚ");
         public static RegexPattern FullAlphabets            => FullLargeAlphabets & FullSmallAlphabets;
-        public static RegexPattern FullNumerics             => new BracketPattern("０", "９");
+        public static RegexPattern FullNumerics             => Of("０", "９");
         public static RegexPattern FullAlphaNumerics        => FullAlphabets & FullNumerics;
-        public static RegexPattern HalfKana                 => new BracketPattern("ｦ", "ﾟ");
-        public static RegexPattern FullKana                 => new BracketPattern("ァ", "ヴ");
+        public static RegexPattern HalfKana                 => Of("ｦ", "ﾟ");
+        public static RegexPattern FullKana                 => Of("ァ", "ヴ");
         public static RegexPattern Kana                     => HalfKana & FullKana;
+        public static RegexPattern Full                     => (Half & HalfKana).Except();
         public static RegexPattern OnlyLargeAlphabets       => LargeAlphabets     .ZeroOrMore().InLine();
         public static RegexPattern OnlySmallAlphabets       => SmallAlphabets     .ZeroOrMore().InLine();
         public static RegexPattern OnlyAlphabets            => Alphabets          .ZeroOrMore().InLine();
         public static RegexPattern OnlyNumerics             => Numerics           .ZeroOrMore().InLine();
         public static RegexPattern OnlyAlphaNumerics        => AlphaNumerics      .ZeroOrMore().InLine();
         public static RegexPattern OnlySymbols              => Symbols            .ZeroOrMore().InLine();
-        public static RegexPattern OnlyHalfChars            => HalfChars          .ZeroOrMore().InLine();
+        public static RegexPattern OnlyHalf                 => Half               .ZeroOrMore().InLine();
         public static RegexPattern OnlyFullLargeAlphabets   => FullLargeAlphabets .ZeroOrMore().InLine();
         public static RegexPattern OnlyFullSmallAlphabets   => FullSmallAlphabets .ZeroOrMore().InLine();
         public static RegexPattern OnlyFullAlphabets        => FullAlphabets      .ZeroOrMore().InLine();
@@ -46,6 +47,7 @@ namespace Lib.Text.RegularExpressions
         public static RegexPattern OnlyHalfKana             => HalfKana           .ZeroOrMore().InLine();
         public static RegexPattern OnlyFullKana             => FullKana           .ZeroOrMore().InLine();
         public static RegexPattern OnlyKana                 => Kana               .ZeroOrMore().InLine();
+        public static RegexPattern OnlyFull                 => Full               .ZeroOrMore().InLine();
 
         readonly protected string _value;
         public virtual string Value => _value;
@@ -60,14 +62,23 @@ namespace Lib.Text.RegularExpressions
         public virtual RegexPattern ZeroOrOne()                 => Append(MetaCharacters.ZeroOrOne);
         public virtual RegexPattern ZeroOrMore()                => Append(MetaCharacters.ZeroOrMore);
         public virtual RegexPattern OneOrMore()                 => Append(MetaCharacters.OneOrMore);
+        public virtual RegexPattern Repete(int length)          => Append(string.Format("{0}{1}{2}", MetaCharacters.BeginOfRepetition, length, MetaCharacters.EndOfRepetition));
+        public virtual RegexPattern Repete(int? min, int? max)  => Append(string.Format("{0}{1},{2}{3}", MetaCharacters.BeginOfRepetition, min, max, MetaCharacters.EndOfRepetition));
         public virtual RegexPattern BeginOfLine()               => new(MetaCharacters.BeginOfLine + Value);
         public virtual RegexPattern EndOfLine()                 => new(Value + MetaCharacters.EndOfLine);
         public virtual RegexPattern InLine()                    => BeginOfLine().EndOfLine();
-        public virtual RegexPattern InBracket()                 => new BracketPattern(Value);
+        public virtual RegexPattern InBracket()                 => InBracket(Value);
+        public virtual RegexPattern Union(RegexPattern value)   => InBracket(_value + value._value);
+        public virtual RegexPattern Except()                    => InBracket(MetaCharacters.Except + _value);
         public virtual RegexPattern Or(RegexPattern pattern)    => new SubExpressionPattern(this, pattern);
-        public virtual RegexPattern Range(int length)           => Append("{" + length + ",}");
-        public virtual RegexPattern Range(int min, int max)     => Append("{" + min + "," + max + "}");
-        public virtual RegexPattern Union(RegexPattern value)   => new(Value + value.Value);
+        public virtual RegexPattern Escape()
+        {
+            var v = (string)Value.Clone();
+            var esc = MetaCharacters.Escape;
+            v = v.Replace(esc.ToString(), new string(esc, 2));
+            foreach (var c in MetaCharacters.All.Where(_ => _ != esc).Select(_ => _.ToString())) v = v.Replace(c, esc + c);
+            return new(v);
+        }
 
         public override string ToString() => Value;
         public static implicit operator string(RegexPattern pattern) => pattern.Value;
@@ -106,7 +117,6 @@ namespace Lib.Text.RegularExpressions
             public override string Value => MetaCharacters.BeginOfBracket + base.Value + MetaCharacters.EndOfBracket;
             public BracketPattern(string value) : base(value) { }
             public BracketPattern(string from, string to) : this(from + MetaCharacters.BracketRange + to) { }
-            public override RegexPattern Union(RegexPattern value) => new BracketPattern(_value + value._value);
         }
         /// <summary> (...) </summary>
         class SubExpressionPattern : RegexPattern
@@ -115,6 +125,7 @@ namespace Lib.Text.RegularExpressions
             public RegexPattern this[int index] => _patterns[index];
             public override string Value =>
                 MetaCharacters.BeginOfSubex + string.Join(MetaCharacters.SeparatorOfSubex, _patterns) + MetaCharacters.EndOfSubex;
+            public SubExpressionPattern(params string[] value) => _patterns.AddRange(value.Select(_ => Of(_)));
             public SubExpressionPattern(params RegexPattern[] value) => _patterns.AddRange(value);
             public SubExpressionPattern(SubExpressionPattern patterns, params RegexPattern[] pattern) : this(patterns._patterns.Concat(pattern).ToArray()) { }
             public override RegexPattern Or(RegexPattern pattern) => new SubExpressionPattern(this, pattern);
