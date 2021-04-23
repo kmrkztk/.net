@@ -15,22 +15,22 @@ namespace Lib.Text.RegularExpressions
         public static RegexPattern Any                      => new(MetaCharacters.Any);
         public static RegexPattern LargeAlphabets           => new BracketPattern("A", "Z");
         public static RegexPattern SmallAlphabets           => new BracketPattern("a", "z");
-        public static RegexPattern Alphabets                => LargeAlphabets | SmallAlphabets;
+        public static RegexPattern Alphabets                => LargeAlphabets & SmallAlphabets;
         public static RegexPattern Numerics                 => new BracketPattern(@"\d");
-        public static RegexPattern AlphaNumerics            => Alphabets | Numerics;
+        public static RegexPattern AlphaNumerics            => Alphabets & Numerics;
         public static RegexPattern Symbols                  => 
-            new BracketPattern(" ", "/") | 
-            new BracketPattern(":", "@") |
+            new BracketPattern(" ", "/") & 
+            new BracketPattern(":", "@") &
             new BracketPattern(@"\[", "~");
         public static RegexPattern HalfChars                => new BracketPattern(" ", "~");
         public static RegexPattern FullLargeAlphabets       => new BracketPattern("Ａ", "Ｚ");
         public static RegexPattern FullSmallAlphabets       => new BracketPattern("ａ", "ｚ");
-        public static RegexPattern FullAlphabets            => FullLargeAlphabets | FullSmallAlphabets;
+        public static RegexPattern FullAlphabets            => FullLargeAlphabets & FullSmallAlphabets;
         public static RegexPattern FullNumerics             => new BracketPattern("０", "９");
-        public static RegexPattern FullAlphaNumerics        => FullAlphabets | FullNumerics;
+        public static RegexPattern FullAlphaNumerics        => FullAlphabets & FullNumerics;
         public static RegexPattern HalfKana                 => new BracketPattern("ｦ", "ﾟ");
         public static RegexPattern FullKana                 => new BracketPattern("ァ", "ヴ");
-        public static RegexPattern Kana                     => HalfKana | FullKana;
+        public static RegexPattern Kana                     => HalfKana & FullKana;
         public static RegexPattern OnlyLargeAlphabets       => LargeAlphabets     .ZeroOrMore().InLine();
         public static RegexPattern OnlySmallAlphabets       => SmallAlphabets     .ZeroOrMore().InLine();
         public static RegexPattern OnlyAlphabets            => Alphabets          .ZeroOrMore().InLine();
@@ -72,9 +72,12 @@ namespace Lib.Text.RegularExpressions
         public override string ToString() => Value;
         public static implicit operator string(RegexPattern pattern) => pattern.Value;
         public static explicit operator RegexPattern(string pattern) => new(pattern);
-        public static RegexPattern operator +(RegexPattern pattern1, RegexPattern pattern2) => pattern1.Union(pattern2);
-        public static RegexPattern operator +(RegexPattern pattern1, string pattern2)       => pattern1.Union(Of(pattern2));
-        public static RegexPattern operator +(RegexPattern pattern1, char pattern2)         => pattern1.Union(Of(pattern2));
+        public static RegexPattern operator +(RegexPattern pattern1, RegexPattern pattern2) => pattern1.Append(pattern2);
+        public static RegexPattern operator +(RegexPattern pattern1, string pattern2)       => pattern1.Append(pattern2);
+        public static RegexPattern operator +(RegexPattern pattern1, char pattern2)         => pattern1.Append(pattern2);
+        public static RegexPattern operator &(RegexPattern pattern1, RegexPattern pattern2) => pattern1.Union(pattern2);
+        public static RegexPattern operator &(RegexPattern pattern1, string pattern2)       => pattern1.Union(Of(pattern2));
+        public static RegexPattern operator &(RegexPattern pattern1, char pattern2)         => pattern1.Union(Of(pattern2));
         public static RegexPattern operator |(RegexPattern pattern1, RegexPattern pattern2) => pattern1.Or(pattern2);
         public static RegexPattern operator |(RegexPattern pattern1, string pattern2)       => pattern1.Or(Of(pattern2));
         public static RegexPattern operator |(RegexPattern pattern1, char pattern2)         => pattern1.Or(Of(pattern2));
@@ -103,7 +106,7 @@ namespace Lib.Text.RegularExpressions
             public override string Value => MetaCharacters.BeginOfBracket + base.Value + MetaCharacters.EndOfBracket;
             public BracketPattern(string value) : base(value) { }
             public BracketPattern(string from, string to) : this(from + MetaCharacters.BracketRange + to) { }
-            public override RegexPattern Or(RegexPattern value) => new BracketPattern(_value + value._value);
+            public override RegexPattern Union(RegexPattern value) => new BracketPattern(_value + value._value);
         }
         /// <summary> (...) </summary>
         class SubExpressionPattern : RegexPattern

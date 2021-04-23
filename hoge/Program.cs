@@ -20,8 +20,8 @@ namespace hoge
             try
             {
                 Console.WriteLine(RegexPattern.OnlyAlphabets | ".,");
-                Console.WriteLine(RegexPattern.Alphabets | RegexPattern.Numerics | RegexPattern.FullAlphabets | RegexPattern.FullNumerics | RegexPattern.Kana);
-                Console.WriteLine((RegexPattern.Alphabets | RegexPattern.Numerics | ".,").ZeroOrMore().InLine());
+                Console.WriteLine(RegexPattern.Alphabets & RegexPattern.Numerics & RegexPattern.FullAlphabets | RegexPattern.FullNumerics | RegexPattern.Kana);
+                Console.WriteLine((RegexPattern.Alphabets & RegexPattern.Numerics & ".,").ZeroOrMore().InLine());
                 Console.WriteLine(RegexPattern.Of("hoge") | "fuga" | "piyo");
 
             }
