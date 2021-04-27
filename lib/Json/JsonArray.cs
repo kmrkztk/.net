@@ -10,7 +10,7 @@ namespace Lib.Json
 {
     public class JsonArray : Json, IList<Json>
     {
-        readonly List<Json> _value = new List<Json>();
+        readonly List<Json> _value = new();
         public JsonArray() : base() { }
         public JsonArray(Stream stream) : base(stream) { }
         public JsonArray(TextReader reader) : base(reader) { }
@@ -55,14 +55,16 @@ namespace Lib.Json
         public override object Cast(Type type)
         {
             if (type == this.GetType()) return this;
-            if (!type.IsGenericType || type.GetGenericTypeDefinition() != typeof(List<>)) throw new ArgumentException();
+            if (!type.IsGenericType || type.GetGenericTypeDefinition() != typeof(List<>)) throw new ArgumentException(null, nameof(type));
             var generic = type.GetGenericArguments()[0];
-            var instance = type.GetConstructor(new Type[] { }).Invoke(new object[] { }) as IList;
+            var instance = type.GetConstructor(Array.Empty<Type>()).Invoke(Array.Empty<object>()) as IList;
             foreach (var o in this.Select(_ => _.Cast(generic))) instance.Add(o);
             return instance;
         }
+        public override IEnumerable<Json> Find(params string[] keys) => this.SelectMany(_ => _.Find(keys));
+
         #region for IList
-        public Json this[int index] { get => ((IList<Json>)_value)[index]; set => ((IList<Json>)_value)[index] = value; }
+        public override Json this[int index] { get => ((IList<Json>)_value)[index]; set => ((IList<Json>)_value)[index] = value; }
         public int Count => ((IList<Json>)_value).Count;
         public bool IsReadOnly => ((IList<Json>)_value).IsReadOnly;
         public void Add(Json item)

@@ -18,7 +18,7 @@ namespace json
             foreach (var j in a.GetReaders()
                 .Select(_ =>
                 {
-                    if (!a.Options.Raw) _.Seek('{');
+                    if (!a.Options.Raw) _.Seek('{', '[');
                     return _;
                 })
                 .Select(_ => Json.Load(_)))
@@ -57,7 +57,7 @@ namespace json
             public bool NoFormat { get; set; }
             [Command]
             public bool Raw { get; set; }
-            public JsonFormatSettings Settings => new JsonFormatSettings()
+            public JsonFormatSettings Settings => new()
             {
                 Indent = Indent,
                 IndentChar = IndentChar,

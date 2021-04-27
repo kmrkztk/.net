@@ -55,21 +55,15 @@ namespace Lib.Json
         public static T Load<T>(Stream stream) => Load<T>(new StreamReader(stream));
         public static T Load<T>(TextReader reader) => Load<T>(new JsonReader(reader));
         public static T Load<T>(JsonReader reader) => Load(reader).Cast<T>();
-        public static JsonObject Load(string value) => Load(new StringReader(value));
-        public static JsonObject Load(Stream stream) => Load(new StreamReader(stream));
-        public static JsonObject Load(TextReader reader) => (JsonObject)Load(new JsonReader(reader));
-        public static Json Load(JsonReader reader)
+        public static Json Load(string value) => Load(new StringReader(value));
+        public static Json Load(Stream stream) => Load(new StreamReader(stream));
+        public static Json Load(TextReader reader) => Load(new JsonReader(reader));
+        public static Json Load(JsonReader reader) => (char)reader.Peek() switch
         {
-            switch ((char)reader.Peek())
-            {
-                case ObjectChar:
-                    return new JsonObject(reader);
-                case ArrayChar:
-                    return new JsonArray(reader);
-                default:
-                    return new JsonValue(reader);
-            }
-        }
+            ObjectChar => new JsonObject(reader),
+            ArrayChar => new JsonArray(reader),
+            _ => new JsonValue(reader),
+        };
         public static JsonValueType GetJsonValueType(string value)
         {
             switch (value)
@@ -84,6 +78,9 @@ namespace Lib.Json
         }
         public string StartChar => this is JsonObject ? ObjectChar.ToString() : this is JsonArray ? ArrayChar.ToString() : "";
         public string EndChar => this is JsonObject ? ObjectCharEnd.ToString() : this is JsonArray ? ArrayCharEnd.ToString() : "";
+        public virtual Json this[string key] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public virtual Json this[int index] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public virtual string Value { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public Json() { }
         public Json(Stream stream) : this(new StreamReader(stream)) { }
         public Json(TextReader reader) : this(new JsonReader(reader)) { }
@@ -94,8 +91,13 @@ namespace Lib.Json
         public string Format() => Format(JsonFormatSettings.Default);
         public abstract string Format(JsonFormatSettings setting);
         public T Cast<T>() => (T)Cast(typeof(T));
+        public JsonObject AsObject() => (JsonObject)this;
+        public JsonArray AsArray() => (JsonArray)this;
+        public JsonValue AsValue() => (JsonValue)this;
         public abstract object Cast(Type type);
-        protected string TrimBlock(string value) => value.Trim(BlockChar);
+        public virtual IEnumerable<Json> Find(params string[] keys) { yield break; }
+
+        protected static string TrimBlock(string value) => value.Trim(BlockChar);
         public override string ToString() => Format();
     }
 }

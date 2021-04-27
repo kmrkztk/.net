@@ -16,7 +16,7 @@ namespace Lib.Json
         int _col;
         char _c;
         char _prev;
-        readonly Queue<char> _last = new Queue<char>();
+        readonly Queue<char> _last = new();
         public TextReader Base => _reader;
         public bool IsInString => _in;
         public bool Escape => _esc;
@@ -61,6 +61,7 @@ namespace Lib.Json
                     switch (c_)
                     {
                         case Json.BlockChar:
+                            if (_c == Json.EscapeChar) break;
                             next();
                             return s.ToString();
                     }
@@ -135,7 +136,7 @@ namespace Lib.Json
             }
             return true;
         }
-        public JsonFormatException FormatException() => new JsonFormatException(_row, _col, new string(_last.ToArray()));
-        public JsonFormatException FormatException(string message) => new JsonFormatException(_row, _col, new string(_last.ToArray()), message);
+        public JsonFormatException FormatException() => new(_row, _col, new string(_last.ToArray()));
+        public JsonFormatException FormatException(string message) => new(_row, _col, new string(_last.ToArray()), message);
     }
 }

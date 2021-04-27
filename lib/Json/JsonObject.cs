@@ -11,7 +11,7 @@ namespace Lib.Json
 {
     public class JsonObject : Json, IDictionary<string, Json>
     {
-        readonly Dictionary<string, Json> _value = new Dictionary<string, Json>();
+        readonly Dictionary<string, Json> _value = new();
         public JsonObject() : base() { }
         public JsonObject(Stream stream) : base(stream) { }
         public JsonObject(TextReader reader) : base(reader) { }
@@ -65,23 +65,22 @@ namespace Lib.Json
         public override object Cast(Type type)
         {
             if (type == this.GetType()) return this;
-            var instance = type.GetConstructor(new Type[] { }).Invoke(new object[] { });
+            var instance = type.GetConstructor(Array.Empty<Type>()).Invoke(Array.Empty<object>());
             var map = PropertyMap.Of(instance);
             foreach (var k in map.Keys) foreach(var p in map[k]) p.SetValue(this[k].Cast(p.PropertyType));
             return instance;
         }
-        public IEnumerable<Json> Find(params string[] keys)
+        public override IEnumerable<Json> Find(params string[] keys)
         {
             foreach (var k in this.Keys)
             {
                 if (keys.Contains(k)) yield return this[k];
-                if (this[k] is JsonObject o1) foreach (var j in o1.Find(keys)) yield return j;
-                if (this[k] is JsonArray a) foreach (var i in a) if (i is JsonObject o2) foreach (var j in o2.Find(keys)) yield return j;
+                foreach (var j in this[k].Find(keys)) yield return j;
             }
         }
 
         #region for IDictionary
-        public Json this[string key] { get => ((IDictionary<string, Json>)_value)[key]; set => ((IDictionary<string, Json>)_value)[key] = value; }
+        public override Json this[string key] { get => ((IDictionary<string, Json>)_value)[key]; set => ((IDictionary<string, Json>)_value)[key] = value; }
         public ICollection<string> Keys => ((IDictionary<string, Json>)_value).Keys;
         public ICollection<Json> Values => ((IDictionary<string, Json>)_value).Values;
         public int Count => ((IDictionary<string, Json>)_value).Count;

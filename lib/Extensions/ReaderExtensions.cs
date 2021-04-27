@@ -9,13 +9,13 @@ namespace Lib
 {
     public static class ReaderExtensions
     {
-        public static int Seek(this TextReader reader, char c)
+        public static int Seek(this TextReader reader, params char[] c)
         {
             int cnt = 0;
             int c_;
             while ((c_ = reader.Peek()) >= 0)
             {
-                if ((char)c_ == c) break;
+                if (c.Any(_ => _ == (char)c_)) break;
                 cnt++;
                 reader.Read();
             }
