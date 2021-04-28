@@ -39,6 +39,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lib.Windows", "lib.Windows\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "2icon", "2icon\2icon.csproj", "{9741E4B2-DF4C-4FB1-856D-6C5492D57900}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pull-tw", "pull-tw\pull-tw.csproj", "{D096A2A2-B3FA-47A3-84FF-A1BE54DB3BEE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +119,10 @@ Global
 		{9741E4B2-DF4C-4FB1-856D-6C5492D57900}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9741E4B2-DF4C-4FB1-856D-6C5492D57900}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9741E4B2-DF4C-4FB1-856D-6C5492D57900}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D096A2A2-B3FA-47A3-84FF-A1BE54DB3BEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D096A2A2-B3FA-47A3-84FF-A1BE54DB3BEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D096A2A2-B3FA-47A3-84FF-A1BE54DB3BEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D096A2A2-B3FA-47A3-84FF-A1BE54DB3BEE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
