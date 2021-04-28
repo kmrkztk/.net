@@ -69,7 +69,11 @@ namespace Lib.Json
                 yield break;
             }
             var next = keys.Skip(1).ToArray();
-            foreach (var j in keys[0] == "*" ? this.SelectMany(_ => _.Find(next)) : this[keys[0]]?.Find(next) ?? Enumerable.Empty<Json>()) yield return j;
+            foreach (var j in
+                keys[0] == "*" ?
+                this.SelectMany(_ => _.Find(next)) :
+                this[keys[0]]?.Find(next) ??
+                Enumerable.Empty<Json>()) yield return j;
         }
 
         #region for IList

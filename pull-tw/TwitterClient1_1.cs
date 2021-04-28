@@ -42,16 +42,22 @@ namespace pull_tw
                     "&user_id=" + user.ID);
                 var response = Get(uri, cancel);
                 var json = Json.Load(response.Content.ReadAsStream(cancel));
-                Console.WriteLine(json.Unescape());
                 return json.AsArray().Select(_ => new Tweet()
                 {
                     User = user,
                     ID = _["id"].Value,
                     Text = _["full_text"].Unescape(),
-                    Medias = _.AsObject().ContainsKey("extended_entities") 
-                    ? _["extended_entities"].AsArray().Select(_ => new Media())
-                    : Enumerable.Empty<Media>(),
-                });
+                    Medias = _["extended_entities"]?["media"]?.AsArray()
+                        .Select(_ => new Media() {
+                            ID = _["id"].Value,
+                            Type = _["type"].Value,
+                            Url = 
+                                _["type"].Value == "photo" ? _["media_url"].Value :
+                                _["type"].Value == "video" ? _["video_info"]["variants"][0]["url"].Value :
+                                null,
+                            })
+                        .Where(_ => _.Url != null)
+                });;
             }
         }
     }

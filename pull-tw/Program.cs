@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
 using Lib;
 
 namespace pull_tw
@@ -18,7 +21,11 @@ namespace pull_tw
             var user = client.GetUser("Twitter");
             Console.WriteLine(user);
             var tl = client.GetTimeline(user);
-            foreach (var t in tl) Console.WriteLine(t);
+            foreach (var t in tl)
+            {
+                Console.WriteLine(t);
+                foreach (var m in t.Medias ?? Enumerable.Empty<Media>()) m.DownloadAsync().Wait();
+            }
             /*
             var favorite = client.GetLikes(account["data"]["id"].Value);
             foreach (var a in favorite.AsArray().Select(_=>_["id"])) Console.WriteLine(a);
