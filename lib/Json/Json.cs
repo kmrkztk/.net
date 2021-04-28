@@ -26,7 +26,7 @@ namespace Lib.Json
         public const char CR = '\r';
         public const char LF = '\n';
         public const string CRLF = "\r\n";
-        readonly static Dictionary<string, string> _esc = new Dictionary<string, string>()
+        readonly static Dictionary<string, string> _esc = new()
         {
             { "\"", "\\\"" },
             { "\\", @"\\" },
@@ -37,12 +37,14 @@ namespace Lib.Json
             { "\r", @"\r" },
             { "\t", @"\\t" },
         };
+        public static string Escape(Json json) => Escape(json.ToString());
         public static string Escape(string value)
         {
             var v = value;
             foreach (var k in _esc.Keys) v = v.Replace(k, _esc[k]);
             return v.UnicodeEscape(); ;
         }
+        public static string Unescape(Json json) => Unescape(json.ToString());
         public static string Unescape(string value)
         {
             var v = value;
@@ -90,13 +92,14 @@ namespace Lib.Json
         public abstract void Import(JsonReader reader);
         public string Format() => Format(JsonFormatSettings.Default);
         public abstract string Format(JsonFormatSettings setting);
+        public string Escape() => Escape(this);
+        public string Unescape() => Unescape(this);
         public T Cast<T>() => (T)Cast(typeof(T));
         public JsonObject AsObject() => (JsonObject)this;
         public JsonArray AsArray() => (JsonArray)this;
         public JsonValue AsValue() => (JsonValue)this;
         public abstract object Cast(Type type);
-        public virtual IEnumerable<Json> Find(params string[] keys) { yield break; }
-
+        public abstract IEnumerable<Json> Find(params string[] keys);
         protected static string TrimBlock(string value) => value.Trim(BlockChar);
         public override string ToString() => Format();
     }

@@ -50,6 +50,11 @@ namespace Lib.Json
             if (type == this.GetType()) return this;
             return System.Convert.ChangeType(_value, type);
         }
+        public override IEnumerable<Json> Find(params string[] keys) 
+        {
+            if (keys.Length == 0) yield return this;
+            yield break; 
+        }
         public override string ToString() => _value;
     }
 }

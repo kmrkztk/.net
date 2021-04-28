@@ -72,15 +72,16 @@ namespace Lib.Json
         }
         public override IEnumerable<Json> Find(params string[] keys)
         {
-            foreach (var k in this.Keys)
-            {
-                if (keys.Contains(k)) yield return this[k];
-                foreach (var j in this[k].Find(keys)) yield return j;
+            if (keys.Length == 0) {
+                yield return this;
+                yield break;
             }
+            var next = keys.Skip(1).ToArray();
+            foreach(var j in keys[0] == "*" ? this.Values.SelectMany(_ => _.Find(next)) : this[keys[0]]?.Find(next) ?? Enumerable.Empty<Json>()) yield return j;
         }
 
         #region for IDictionary
-        public override Json this[string key] { get => ((IDictionary<string, Json>)_value)[key]; set => ((IDictionary<string, Json>)_value)[key] = value; }
+        public override Json this[string key] { get => _value.ContainsKey(key) ? ((IDictionary<string, Json>)_value)[key] : null; set => ((IDictionary<string, Json>)_value)[key] = value; }
         public ICollection<string> Keys => ((IDictionary<string, Json>)_value).Keys;
         public ICollection<Json> Values => ((IDictionary<string, Json>)_value).Values;
         public int Count => ((IDictionary<string, Json>)_value).Count;

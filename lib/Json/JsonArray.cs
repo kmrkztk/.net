@@ -61,10 +61,20 @@ namespace Lib.Json
             foreach (var o in this.Select(_ => _.Cast(generic))) instance.Add(o);
             return instance;
         }
-        public override IEnumerable<Json> Find(params string[] keys) => this.SelectMany(_ => _.Find(keys));
+        public override IEnumerable<Json> Find(params string[] keys)
+        {
+            if (keys.Length == 0)
+            {
+                yield return this;
+                yield break;
+            }
+            var next = keys.Skip(1).ToArray();
+            foreach (var j in keys[0] == "*" ? this.SelectMany(_ => _.Find(next)) : this[keys[0]]?.Find(next) ?? Enumerable.Empty<Json>()) yield return j;
+        }
 
         #region for IList
         public override Json this[int index] { get => ((IList<Json>)_value)[index]; set => ((IList<Json>)_value)[index] = value; }
+        public override Json this[string key] { get => ((IList<Json>)_value)[int.Parse(key)]; set => ((IList<Json>)_value)[int.Parse(key)] = value; }
         public int Count => ((IList<Json>)_value).Count;
         public bool IsReadOnly => ((IList<Json>)_value).IsReadOnly;
         public void Add(Json item)

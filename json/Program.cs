@@ -15,7 +15,7 @@ namespace json
         static void Main()
         {
             var a = FileArguments<Options>.Load();
-            foreach (var j in a.GetReaders()
+            foreach (var json in a.GetReaders()
                 .Select(_ =>
                 {
                     if (!a.Options.Raw) _.Seek('{', '[');
@@ -23,14 +23,7 @@ namespace json
                 })
                 .Select(_ => Json.Load(_)))
             {
-                if (a.Options.HasKey)
-                {
-                    foreach (var v in j.Find(a.Options.Key.ToArray())) Console.WriteLine(v is JsonValue ? v.ToString() : v.Format(a.Options.Settings));
-                }
-                else
-                {
-                    Console.WriteLine(j.Format(a.Options.Settings));
-                }
+                foreach (var j in json.Find(a.Options.Key.ToArray())) Console.WriteLine(j is JsonValue ? j.ToString() : j.Format(a.Options.Settings));
             }
 #if DEBUG
             ConsoleEx.Pause();
@@ -42,6 +35,9 @@ namespace json
             [Command("k")]
             [CommandValue]
             public List<string> Key { get; set; } = new List<string>();
+            [Command]
+            [CommandValue]
+            public string Keys { get => string.Join(".", Key); set => Key = value.Split(".").ToList(); }
             public bool HasKey => Key.Count > 0;
             [Command("indent-char")]
             [CommandValue]

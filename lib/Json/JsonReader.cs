@@ -122,9 +122,11 @@ namespace Lib.Json
             if (_in)
             {
                 if (_esc) return true;
+                /*
                 if (c == Json.LF) throw FormatException();
                 if (c == Json.CR) throw FormatException();
                 if (c == Json.Tab) throw FormatException();
+                */
             }
             else
             {
