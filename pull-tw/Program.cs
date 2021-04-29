@@ -1,8 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Lib;
+using Lib.Web.Twitter;
 
 namespace pull_tw
 {
@@ -17,30 +21,36 @@ namespace pull_tw
 
         static void Main()
         {
-            using var client = TwitterClient.V1_1(bearer);
-            var user = client.GetUser("Twitter");
-            Console.WriteLine(user);
-            var tl = client.GetTimeline(user);
-            foreach (var t in tl)
-            {
-                Console.WriteLine(t);
-                foreach (var m in t.Medias ?? Enumerable.Empty<Media>()) m.DownloadAsync().Wait();
-            }
-            /*
-            var favorite = client.GetLikes(account["data"]["id"].Value);
-            foreach (var a in favorite.AsArray().Select(_=>_["id"])) Console.WriteLine(a);
-
-            foreach (var a in favorite.AsArray().Select(_ => _["id"]))
-            {
-                var show = client.GetShow(a.Value);
-                Console.WriteLine(show);
-            }
-            //var timeline = client.GetTimeline(account["data"]["id"].Value);
-            //foreach (var t in timeline.AsObject().Find("text")) Console.WriteLine(t);
-            */
+            using var client = new TwitterClient(bearer);
+            Download(client, "Twitter");
             ConsoleEx.Pause();
         }
-
-
+        static void Download(TwitterClient client, string username)
+        {
+            var regex = new System.Text.RegularExpressions.Regex(@"\?.+$");
+            var option = new TimelineOption() 
+            {
+                MaxResult = 100,
+                Expansions = TimelineOption.ExpansionsOptions.AttachmentsMediaKeys,
+                TweetFields = TimelineOption.TweetFieldsOptions.Attachments,
+                MediaFields = TimelineOption.MediaFieldsOptions.Type | TimelineOption.MediaFieldsOptions.Url,
+                Exclude = TimelineOption.ExcludeOptions.Replies | TimelineOption.ExcludeOptions.Retweets,
+            };
+            Console.WriteLine(option);
+            var dirname = @".\" + username;
+            if (!File.Exists(dirname)) Directory.CreateDirectory(@".\" + dirname);
+            var user = client.GetUserAsync(username).Result;
+            do
+            {
+                var tl = client.GetTimelineAsync(user, option).Result;
+                var dl = new HttpClient();
+                foreach (var t in tl)
+                    foreach (var m in t.Medias?.Where(_ => _.Url != null) ?? Enumerable.Empty<Media>()) 
+                        dl.DownloadAsync(m.Url, dirname + @"\" + m.ID + regex.Replace(Path.GetExtension(m.Url), "")).Wait();
+                if (!tl.Any()) break;
+                option.NextToken = tl.Meta.NextToken;
+            }
+            while (!string.IsNullOrEmpty(option.NextToken));
+        }
     }
 }

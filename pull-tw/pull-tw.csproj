@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\lib.Sign\lib.Sign.csproj" />
+    <ProjectReference Include="..\lib.Web.Twitter\lib.Web.Twitter.csproj" />
     <ProjectReference Include="..\lib\lib.csproj" />
   </ItemGroup>
 	<ItemGroup>
