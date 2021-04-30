@@ -43,7 +43,7 @@ namespace Lib.Web.Twitter
         {
             var uri = URL + "/2/users/" + user.ID + "/tweets" + "?" + options?.ToString();
             var json = await this.GetJsonAsync(uri, cancel);
-            var medias = json["includes"]["media"].AsArray()
+            var medias = json["includes"]?["media"]?.AsArray()
                 .ToDictionary(
                 _ => _["media_key"].Value, 
                 _ => new Media()
@@ -51,26 +51,28 @@ namespace Lib.Web.Twitter
                         ID = _["media_key"].Value,
                         Url = _["url"]?.Value,
                         Type = _["type"].Value,
-                    });
-            return new Timeline(json["data"].AsArray().Select(_ => new Tweet()
+                    }) ?? new();
+            return new Timeline(json["data"]?.AsArray().Select(_ => new Tweet()
             {
                 User = user,
                 ID = _["id"].Value,
                 Text = _["text"].Unescape(),
                 Medias = _["attachments"]?["media_keys"]?.AsArray()
-                    .Select(__ =>
-                        medias[__.Value].Type == "photo" ?
-                        medias[__.Value] :
+                    .Select(_ => _.Value)
+                    .Where(_ => medias.ContainsKey(_))
+                    .Select(k =>
+                        medias[k].Type == "photo" ?
+                        medias[k] :
                         GetTweetAsync(_["id"].Value, cancel).Result.Medias.FirstOrDefault()
                         ),
-            }))
+            }) ?? Enumerable.Empty<Tweet>())
             {
                 Meta = new()
                 {
-                    NextToken = json["meta"]["next_token"]?.Value,
-                    NewestId = json["meta"]["newest_id"]?.Value,
-                    OldestId = json["meta"]["oldest_id"]?.Value,
-                    ResultCount = int.Parse(json["meta"]["result_count"]?.Value),
+                    NextToken = json["meta"]?["next_token"]?.Value,
+                    NewestId = json["meta"]?["newest_id"]?.Value,
+                    OldestId = json["meta"]?["oldest_id"]?.Value,
+                    ResultCount = int.Parse(json["meta"]?["result_count"]?.Value),
                 }
             };
             //return json["data"].AsArray().Select(_ => GetTweetAsync(_["id"].Value, cancel).Result);

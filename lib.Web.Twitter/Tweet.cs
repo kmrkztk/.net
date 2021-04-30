@@ -27,6 +27,8 @@ namespace Lib.Web.Twitter
         public string ID { get; init; }
         public string Type { get; init; }
         public string Url { get; init; }
+        public bool IsPhoto => Type == "photo";
+        public bool IsVideo => Type == "video";
         public override string ToString() => string.Format("({0})[{1}]{2}", ID, Type, Url);
     }
     public class Place

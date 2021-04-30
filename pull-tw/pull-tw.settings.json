@@ -20,6 +20,19 @@
 			"save-to": ".\\"
 		},
 		{
+			"username": "Twitter",
+			"userid": "",
+			"tweet-type": [
+				"tweet",
+			],
+			"save-content": [
+				"text",
+				"photo",
+				"video"
+			],
+			"save-to": ".\\Twitter"
+		},
+		{
 		}
 	]
 }

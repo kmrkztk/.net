@@ -67,7 +67,7 @@ namespace Lib.Web.Twitter
         [Flags]
         public enum PlaceFieldsOptions
         {
-            [Name(null)]                one             = 0x00,
+            [Name(null)]                None            = 0x00,
             [Name("contained_within")]  ContainedWithin = 0x01,
             [Name("country")]           Country         = 0x02,
             [Name("country_code")]      CountryCode     = 0x04,
