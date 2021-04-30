@@ -1,0 +1,25 @@
+{
+	"bearer": "AAAAAAAAAAAAAAAAAAAAAEvyOgEAAAAALs4sGxcBrM2XSciu7jLTT03nCNU%3DgSWssI9KOcXOOY7BKdhSL0pCfknjp6F4lZOPbwuLoU7ZNxVl8D",
+	"access-key": "",
+	"secret-key": "",
+	"targets": [
+		{
+			"username": "",
+			"userid": "",
+			"tweet-type": [
+				"tweet",
+				"reply",
+				"retweet",
+				"like"
+			],
+			"save-content": [
+				"text",
+				"photo",
+				"video"
+			],
+			"save-to": ".\\"
+		},
+		{
+		}
+	]
+}

@@ -67,7 +67,7 @@ namespace Lib.Json
             if (type == this.GetType()) return this;
             var instance = type.GetConstructor(Array.Empty<Type>()).Invoke(Array.Empty<object>());
             var map = PropertyMap.Of(instance);
-            foreach (var k in map.Keys) foreach(var p in map[k]) p.SetValue(this[k].Cast(p.PropertyType));
+            foreach (var k in map.Keys) foreach(var p in map[k]) p.SetValue(this[k]?.Cast(p.PropertyType));
             return instance;
         }
         public override IEnumerable<Json> Find(params string[] keys)

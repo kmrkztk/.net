@@ -31,7 +31,7 @@ namespace Lib.Reflection
             }
             else SetValue(value);
         }
-        protected static object ConvertType(object value, Type type) => value.GetType() == type ? value : Convert.ChangeType(value, type);
+        protected static object ConvertType(object value, Type type) => value == null ? null : value.GetType() == type ? value : Convert.ChangeType(value, type);
         public override string ToString() => string.Format("{0}.{1} = {2}", Instance.GetType().Name, Info.Name, Info.GetValue(Instance));
 
         public static IEnumerable<Property> GetProperties(object instance) => instance.GetType()

@@ -22,7 +22,7 @@ namespace Lib.Web.Twitter
         public static async Task<Json.Json> GetJsonAsync(this HttpClient client, Uri requestUri, HttpCompletionOption completionOption, CancellationToken cancellationToken)
         {
             var json = Json.Json.Load(await (await client.GetAsync(requestUri, completionOption, cancellationToken)).Content.ReadAsStreamAsync(cancellationToken));
-            Console.WriteLine(json.Unescape());
+            //Console.WriteLine(json.Unescape());
             return json;
         }
         public static async Task<Stream> DownloadAsync(this HttpClient client, string uri) => await DownloadAsync(client, uri, CancellationToken.None);
