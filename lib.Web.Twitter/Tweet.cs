@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Lib.Entity;
 
 namespace Lib.Web.Twitter
 {
     public class Tweet
     {
-        public string ID { get; init; }
+        public ID ID { get; init; }
         public string Text { get; init; }
+        public DateTime CreatedAt { get; init; }
         public IEnumerable<Media> Medias { get; init; }
         public User User { get; init; }
         public override string ToString() => 
@@ -18,13 +20,14 @@ namespace Lib.Web.Twitter
     }
     public class User
     {
-        public string ID { get; init; }
+        public ID ID { get; init; }
         public string Name { get; init; }
         public override string ToString() => string.Format("({0}){1}", ID, Name);
     }
     public class Media
     {
-        public string ID { get; init; }
+        public ID ID { get; init; }
+        public string Key { get; init; }
         public string Type { get; init; }
         public string Url { get; init; }
         public bool IsPhoto => Type == "photo";

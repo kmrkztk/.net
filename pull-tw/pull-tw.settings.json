@@ -21,14 +21,12 @@
 		},
 		{
 			"username": "Twitter",
-			"userid": "",
 			"tweet-type": [
-				"tweet",
+				"tweet"
 			],
 			"save-content": [
 				"text",
-				"photo",
-				"video"
+				"photo"
 			],
 			"save-to": ".\\Twitter"
 		},

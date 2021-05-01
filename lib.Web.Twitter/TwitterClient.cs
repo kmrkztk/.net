@@ -20,6 +20,12 @@ namespace Lib.Web.Twitter
         public TwitterClient(string bearer, HttpMessageHandler handler, bool disposeHandler) : base(handler, disposeHandler) =>
             DefaultRequestHeaders.Authorization = new("Bearer", bearer);
 
+        public async Task<Json.Json> GetJsonAsync(string url, CancellationToken cancel)
+        {
+            var json = await HttpClientExtensions.GetJsonAsync(this, url, cancel);
+            if (json["errors"] != null) throw new TwitterApiException(json);
+            return json;
+        }
         public async Task<User> GetUserAsync(string name) => await GetUserAsync(name, CancellationToken.None);
         public async Task<User> GetUserAsync(string name, CancellationToken cancel) 
         {
@@ -48,7 +54,8 @@ namespace Lib.Web.Twitter
                 _ => _["media_key"].Value, 
                 _ => new Media()
                     {
-                        ID = _["media_key"].Value,
+                        ID = _["media_key"].Value.Split("_")[1],
+                        Key = _["media_key"].Value,
                         Url = _["url"]?.Value,
                         Type = _["type"].Value,
                     }) ?? new();
@@ -57,6 +64,7 @@ namespace Lib.Web.Twitter
                 User = user,
                 ID = _["id"].Value,
                 Text = _["text"].Unescape(),
+                CreatedAt = DateTime.Parse(_["created_at"]?.Value),
                 Medias = _["attachments"]?["media_keys"]?.AsArray()
                     .Select(_ => _.Value)
                     .Where(_ => medias.ContainsKey(_))
@@ -72,7 +80,7 @@ namespace Lib.Web.Twitter
                     NextToken = json["meta"]?["next_token"]?.Value,
                     NewestId = json["meta"]?["newest_id"]?.Value,
                     OldestId = json["meta"]?["oldest_id"]?.Value,
-                    ResultCount = int.Parse(json["meta"]?["result_count"]?.Value),
+                    ResultCount = int.Parse(json["meta"]?["result_count"]?.Value ?? "0"),
                 }
             };
             //return json["data"].AsArray().Select(_ => GetTweetAsync(_["id"].Value, cancel).Result);

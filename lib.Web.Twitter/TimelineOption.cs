@@ -114,8 +114,8 @@ namespace Lib.Web.Twitter
             [Name("retweets")] Retweets = 0x02,
         }
 
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
+        public DateTime? StartTime { get; set; }
+        public DateTime? EndTime { get; set; }
         public string SinceId { get; set; }
         public string UntilId { get; set; }
         public int? MaxResult { get; set; }
@@ -129,8 +129,8 @@ namespace Lib.Web.Twitter
         public ExcludeOptions Exclude { get; set; }
 
 #pragma warning disable IDE1006 
-        [Name("start_date")]        protected string _StartDate => StartDate?.ToString("yyyy/MM/dd HH:mm:ss");
-        [Name("end_date")]          protected string _EndDate => EndDate?.ToString("yyyy/MM/dd HH:mm:ss");
+        [Name("start_time")]        protected string _StartTime => StartTime?.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
+        [Name("end_time")]          protected string _EndTime => EndTime?.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
         [Name("since_id")]          protected string _SinceId => SinceId;
         [Name("until_id")]          protected string _UntilId => UntilId;
         [Name("max_results")]       protected string _MaxResult => MaxResult?.ToString();

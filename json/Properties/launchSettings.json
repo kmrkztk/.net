@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "json": {
+      "commandName": "Project",
+      "commandLineArgs": ".\\hoge.json"
+    }
+  }
+}

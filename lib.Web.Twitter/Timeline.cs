@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Lib.Entity;
 
 namespace Lib.Web.Twitter
 {
@@ -19,8 +20,8 @@ namespace Lib.Web.Twitter
     public class Meta
     {
         public int ResultCount { get; init; }
-        public string OldestId { get; init; }
-        public string NewestId { get; init; }
+        public ID OldestId { get; init; }
+        public ID NewestId { get; init; }
         public string NextToken { get; init; }
     }
 }
