@@ -33,7 +33,20 @@ namespace pull_tw
             [Mapping("userid")] public string UserID { get; set; }
             [Mapping("tweet-type")] public List<string> TweetType { get; set; }
             [Mapping("save-content")] public List<string> Contents { get; set; }
-            [Mapping("save-to")] public string SaveTo { get; set; }
+
+            string _saveTo = null;
+            [Mapping("save-to")] public string SaveTo 
+            {
+                get => _saveTo ?? @".\" + UserName;
+                set => _saveTo = value; 
+            }
+
+            DateTime? _starttime = null;
+            [Mapping("start-time")] public string StartTime 
+            {
+                get => _starttime.GetValueOrDefault().ToString("yyyy/MM/dd HH:mm:ss"); 
+                set => _starttime = value == null ? null : DateTime.Parse(value); 
+            }
 
             public bool HasText => Contents.Any(_ => _.ToLower() == "text");
             public bool HasPhoto => Contents.Any(_ => _.ToLower() == "photo");
@@ -61,6 +74,7 @@ namespace pull_tw
                 (HasRetweet ? TimelineOption.ExcludeOptions.None : TimelineOption.ExcludeOptions.Retweets) |
                 TimelineOption.ExcludeOptions.None,
                 SinceId = NewestId,
+                StartTime = _starttime,
             };
             public void CreateSavingTo() => Directory.CreateDirectory(SaveTo);
             public void Download(Timeline timeline)
