@@ -26,7 +26,6 @@ namespace pull_tw
                 Console.WriteLine("download '{0}'...", target.UserName);
                 target.CreateSavingTo();
                 var option = target.Option;
-                option.EndTime = DateTime.Parse("2020/11/28 18:59:13").AddSeconds(-1);
                 do
                 {
                     var timeline = client.GetTimelineAsync(target.UserName, option).Result;
