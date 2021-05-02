@@ -21,16 +21,27 @@ namespace pull_tw
             using var client = new TwitterClient(settings.Bearer);
             settings.Targets
                 .Where(_ => !string.IsNullOrEmpty(_.UserName))
-                .Foreach(_ =>
+                .Foreach(target =>
             {
-                _.CreateSavingTo();
-                var option = _.Option;
+                Console.WriteLine("download '{0}'...", target.UserName);
+                target.CreateSavingTo();
+                var option = target.Option;
+                option.EndTime = DateTime.Parse("2020/11/28 18:59:13").AddSeconds(-1);
                 do
                 {
-                    var timeline = client.GetTimelineAsync(_.UserName, option).Result;
-                    _.Download(timeline);
-                    option.UntilId = timeline.Meta.OldestId - 1;
+                    var timeline = client.GetTimelineAsync(target.UserName, option).Result;
+                    timeline.Foreach(_ =>
+                    {
+                        Console.WriteLine("saving... [{0}] {1}", _.ID, _.CreatedAt);
+                        if (target.HasText) target.Download(_);
+                        _.Medias?
+                            .Where(_ => _ != null)
+                            .Where(_ => (_.IsPhoto && target.HasPhoto) || (_.IsVideo && target.HasVideo))
+                            .Foreach(_ => target.Download(_));
+                    });
+                    target.Download(timeline.Meta);
                     if (timeline.Meta.ResultCount == 0) break;
+                    option.EndTime = timeline.Min(_ => _.CreatedAt).AddSeconds(-1);
                 }
                 while (true);
             });

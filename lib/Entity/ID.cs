@@ -12,7 +12,7 @@ namespace Lib.Entity
         public decimal? Value { get; private set; }
         public decimal ValueOrZero => Value ?? decimal.Zero;
         public ID(decimal? value) => Value = value;
-        public ID(string value) : this(value == null ? null : decimal.Parse(value)) { }
+        public ID(string value) : this(string.IsNullOrEmpty(value) ? null : decimal.Parse(value)) { }
         public override string ToString() => Value?.ToString() ?? string.Empty;
         public int CompareTo(ID other)
         {

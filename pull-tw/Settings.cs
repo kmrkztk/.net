@@ -48,6 +48,8 @@ namespace pull_tw
                 set => _starttime = value == null ? null : DateTime.Parse(value); 
             }
 
+            [Mapping("refresh")] public bool Refresh { get; set; }
+
             public bool HasText => Contents.Any(_ => _.ToLower() == "text");
             public bool HasPhoto => Contents.Any(_ => _.ToLower() == "photo");
             public bool HasVideo => Contents.Any(_ => _.ToLower() == "video");
@@ -73,23 +75,11 @@ namespace pull_tw
                 (HasReply ? TimelineOption.ExcludeOptions.None : TimelineOption.ExcludeOptions.Replies) |
                 (HasRetweet ? TimelineOption.ExcludeOptions.None : TimelineOption.ExcludeOptions.Retweets) |
                 TimelineOption.ExcludeOptions.None,
-                SinceId = NewestId,
+                SinceId = Refresh ? ID.Null : NewestId,
                 StartTime = _starttime,
             };
             public void CreateSavingTo() => Directory.CreateDirectory(SaveTo);
-            public void Download(Timeline timeline)
-            {
-                timeline.Foreach(_ =>
-                {
-                    Console.WriteLine("saving... [{0}] {1}", _.ID, _.CreatedAt);
-                    if (HasText) Download(_);
-                    _.Medias?
-                        .Where(_ => _ != null)
-                        .Where(_ => (_.IsPhoto && HasPhoto) || (_.IsVideo && HasVideo))
-                        .Foreach(_ => Download(_));
-                });
-                Download(timeline.Meta);
-            }
+
             public void Download(Tweet tweet)
             {
                 var filename = SaveTo + "\\" + tweet.ID + ".txt";
