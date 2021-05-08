@@ -66,15 +66,13 @@ namespace pull_tw
             public TimelineOption Option => new()
             {
                 MaxResult = 100,
-                Expansions = HasMedia ? TimelineOption.ExpansionsOptions.AttachmentsMediaKeys : TimelineOption.ExpansionsOptions.None,
-                TweetFields =
-                (HasMedia ? TimelineOption.TweetFieldsOptions.Attachments : TimelineOption.TweetFieldsOptions.None) |
-                TimelineOption.TweetFieldsOptions.CreatedAt,
-                MediaFields = HasMedia ? TimelineOption.MediaFieldsOptions.Type | TimelineOption.MediaFieldsOptions.Url : TimelineOption.MediaFieldsOptions.None,
-                Exclude =
-                (HasReply ? TimelineOption.ExcludeOptions.None : TimelineOption.ExcludeOptions.Replies) |
-                (HasRetweet ? TimelineOption.ExcludeOptions.None : TimelineOption.ExcludeOptions.Retweets) |
-                TimelineOption.ExcludeOptions.None,
+                Expansions = HasMedia ? ExpansionsOptions.AttachmentsMediaKeys : ExpansionsOptions.None,
+                TweetFields = (HasMedia ? TweetFieldsOptions.Attachments : TweetFieldsOptions.None) | TweetFieldsOptions.CreatedAt,
+                MediaFields = HasMedia ? MediaFieldsOptions.Type | MediaFieldsOptions.Url : MediaFieldsOptions.None,
+                //Exclude =
+                //(HasReply ? TimelineOption.ExcludeOptions.None : TimelineOption.ExcludeOptions.Replies) |
+                //(HasRetweet ? TimelineOption.ExcludeOptions.None : TimelineOption.ExcludeOptions.Retweets) |
+                //TimelineOption.ExcludeOptions.None,
                 SinceId = Refresh ? ID.Null : NewestId,
                 StartTime = _starttime,
             };
@@ -85,7 +83,7 @@ namespace pull_tw
                 var filename = SaveTo + "\\" + tweet.ID + ".txt";
                 File.WriteAllText(filename, tweet.Text);
             }
-            public void Download(Media media)
+            public void Download(Tweet.Media media)
             {
                 var regex = new Regex(@"\?.+$");
                 var filename = SaveTo + "\\" + media.ID + Path.GetExtension(regex.Replace(media.Url, ""));

@@ -77,8 +77,8 @@ namespace Lib.Json
         }
 
         #region for IList
-        public override Json this[int index] { get => ((IList<Json>)_value)[index]; set => ((IList<Json>)_value)[index] = value; }
-        public override Json this[string key] { get => ((IList<Json>)_value)[int.Parse(key)]; set => ((IList<Json>)_value)[int.Parse(key)] = value; }
+        public override Json this[int index] { get => _value[index]; set => _value[index] = value; }
+        public override Json this[string key] { get => this[int.Parse(key)]; set => this[int.Parse(key)] = value; }
         public int Count => ((IList<Json>)_value).Count;
         public bool IsReadOnly => ((IList<Json>)_value).IsReadOnly;
         public void Add(Json item)

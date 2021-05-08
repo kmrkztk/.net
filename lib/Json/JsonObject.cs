@@ -85,7 +85,11 @@ namespace Lib.Json
         }
 
         #region for IDictionary
-        public override Json this[string key] { get => _value.ContainsKey(key) ? ((IDictionary<string, Json>)_value)[key] : null; set => ((IDictionary<string, Json>)_value)[key] = value; }
+        public override Json this[string key] 
+        {
+            get => _value.ContainsKey(key) ? _value[key] : null;
+            set { if (_value.ContainsKey(key)) _value[key] = value; else Add(key, value); }
+        }
         public ICollection<string> Keys => ((IDictionary<string, Json>)_value).Keys;
         public ICollection<Json> Values => ((IDictionary<string, Json>)_value).Values;
         public int Count => ((IDictionary<string, Json>)_value).Count;

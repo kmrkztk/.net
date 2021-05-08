@@ -22,7 +22,9 @@
 		{
 			"username": "Twitter",
 			"tweet-type": [
-				"tweet"
+				"tweet",
+				"reply",
+				"retweet"
 			],
 			"save-content": [
 				"text",

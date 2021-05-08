@@ -40,7 +40,7 @@ namespace pull_tw
                     });
                     target.Download(timeline.Meta);
                     if (timeline.Meta.ResultCount == 0) break;
-                    option.EndTime = timeline.Min(_ => _.CreatedAt).AddSeconds(-1);
+                    option.EndTime = timeline.Min(_ => _.CreatedAt)?.AddSeconds(-1);
                 }
                 while (true);
             });
