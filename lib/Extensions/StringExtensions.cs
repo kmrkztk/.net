@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Lib.Text;
 
 namespace Lib
 {
@@ -27,5 +28,11 @@ namespace Lib
             var c = _.Value[2..].ToBinary();
             return Encoding.BigEndianUnicode.GetString(c.Part(c[0] == 0 ? 1 : 0));
         });
+        public static string ToPascalCase(this string value)    => NameStyleCase.ToPascalCase(value);
+        public static string ToCamelCase(this string value)     => NameStyleCase.ToCamelCase(value);
+        public static string ToSnakeCase(this string value)     => NameStyleCase.ToSnakeCase(value);
+        public static string ToConstantCase(this string value)  => NameStyleCase.ToConstantCase(value);
+        public static string ToChainCase(this string value)     => NameStyleCase.ToChainCase(value);
+        public static string ToKebabuCase(this string value)    => NameStyleCase.ToKebabuCase(value);
     }
 }

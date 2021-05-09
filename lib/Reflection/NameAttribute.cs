@@ -11,7 +11,9 @@ namespace Lib
     public class NameAttribute : Attribute
     {
         public string Value { get; init; }
+        public NameAttribute() : this(null) { }
         public NameAttribute(string value) => Value = value;
-        public static string GetName(MemberInfo info) => info?.GetCustomAttribute<NameAttribute>()?.Value ?? info?.Name;
+        public virtual string GetValue(MemberInfo info) => Value ?? info?.Name;
+        public static string GetName(MemberInfo info) => info?.GetCustomAttribute<NameAttribute>()?.GetValue(info);
     }
 }
