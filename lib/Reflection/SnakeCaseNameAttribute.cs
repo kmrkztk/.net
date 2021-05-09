@@ -10,6 +10,6 @@ namespace Lib
     [AttributeUsage(AttributeTargets.All)]
     public class SnakeCaseNameAttribute : NameAttribute
     {
-        public override string GetValue(MemberInfo info) => info?.Name.ToSnakeCase();
+        public override string GetName(MemberInfo info) => info?.Name.ToSnakeCase();
     }
 }

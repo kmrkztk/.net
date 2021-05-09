@@ -10,6 +10,6 @@ namespace Lib
     [AttributeUsage(AttributeTargets.All)]
     public class UpperNameAttribute : NameAttribute
     {
-        public override string GetValue(MemberInfo info) => info?.Name.ToUpper();
+        public override string GetName(MemberInfo info) => info?.Name.ToUpper();
     }
 }

@@ -10,6 +10,6 @@ namespace Lib
     [AttributeUsage(AttributeTargets.All)]
     public class PascalCaseNameAttribute : NameAttribute
     {
-        public override string GetValue(MemberInfo info) => info?.Name.ToPascalCase();
+        public override string GetName(MemberInfo info) => info?.Name.ToPascalCase();
     }
 }

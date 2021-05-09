@@ -14,7 +14,7 @@ namespace Lib.Reflection
             instance.GetType()
                 .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                 .SelectMany(_ =>
-                    MappingAttribute.GetMappingNames(_).Select(n =>
+                    NameAttribute.GetMemberNames(_).Select(n =>
                     new KeyValuePair<string, Property>(n, new Property(instance, _)))));
         public PropertyMap() : base() { }
         public PropertyMap(IEnumerable<KeyValuePair<string, Property>> dictionary) : base(dictionary) { }

@@ -10,6 +10,6 @@ namespace Lib
     [AttributeUsage(AttributeTargets.All)]
     public class ConstantCaseNameAttribute : NameAttribute
     {
-        public override string GetValue(MemberInfo info) => info?.Name.ToConstantCase();
+        public override string GetName(MemberInfo info) => info?.Name.ToConstantCase();
     }
 }

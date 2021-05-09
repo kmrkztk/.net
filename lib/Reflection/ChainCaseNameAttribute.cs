@@ -10,6 +10,6 @@ namespace Lib
     [AttributeUsage(AttributeTargets.All)]
     public class ChainCaseNameAttribute : NameAttribute
     {
-        public override string GetValue(MemberInfo info) => info?.Name.ToChainCase();
+        public override string GetName(MemberInfo info) => info?.Name.ToChainCase();
     }
 }

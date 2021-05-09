@@ -45,11 +45,11 @@ namespace Lib.Web.Twitter
         public override string ToString() => string.Join("&",
             this.GetType().GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
             .Where(_ => _.HasAttribute<NameAttribute>())
-            .Select(_ => (NameAttribute.GetName(_), _.GetValue(this) as string))
+            .Select(_ => (NameAttribute.GetMemberName(_), _.GetValue(this) as string))
             .Where(_ => !string.IsNullOrEmpty(_.Item2))
             .Select(_ => string.Format("{0}={1}", _.Item1, _.Item2)));
         public static TEnum FlagsOf<TEnum>(params string[] values) where TEnum : struct, Enum => Enum.GetValues<TEnum>()
-            .Where(_ => values.Any(v => v == NameAttribute.GetName(typeof(TEnum).GetField(_.ToString()))))
+            .Where(_ => values.Any(v => v == NameAttribute.GetMemberName(typeof(TEnum).GetField(_.ToString()))))
             .Sum();
         public static string ToParameters<TEnum>(TEnum flags) where TEnum : struct, Enum => (int)(object)flags == 0x00 
             ? null 
@@ -58,6 +58,6 @@ namespace Lib.Web.Twitter
 #pragma warning disable CA2248
                 .Where(_ =>  flags.HasFlag(_))
 #pragma warning restore CA2248
-                .Select(_ => NameAttribute.GetName(typeof(TEnum).GetField(_.ToString()))));
+                .Select(_ => NameAttribute.GetMemberName(typeof(TEnum).GetField(_.ToString()))));
     }
 }

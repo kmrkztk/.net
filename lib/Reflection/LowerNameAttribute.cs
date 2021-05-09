@@ -10,6 +10,6 @@ namespace Lib
     [AttributeUsage(AttributeTargets.All)]
     public class LowerNameAttribute : NameAttribute
     {
-        public override string GetValue(MemberInfo info) => info?.Name.ToLower();
+        public override string GetName(MemberInfo info) => info?.Name.ToLower();
     }
 }

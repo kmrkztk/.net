@@ -22,33 +22,33 @@ namespace pull_tw
             using var fs = new FileStream("pull-tw.settings.json", FileMode.Open);
             return Json.Load<Settings>(fs);
         }
-        [Mapping("bearer")] public string Bearer { get; set; }
-        [Mapping("access-key")] public string AccessKey { get; set; }
-        [Mapping("secret-key")] public string SecretKey { get; set; }
-        [Mapping("targets")]
+        [Name("bearer")] public string Bearer { get; set; }
+        [Name("access-key")] public string AccessKey { get; set; }
+        [Name("secret-key")] public string SecretKey { get; set; }
+        [Name("targets")]
         public List<Target> Targets { get; set; }
         public class Target
         {
-            [Mapping("username")] public string UserName { get; set; }
-            [Mapping("userid")] public string UserID { get; set; }
-            [Mapping("tweet-type")] public List<string> TweetType { get; set; }
-            [Mapping("save-content")] public List<string> Contents { get; set; }
+            [Name("username")] public string UserName { get; set; }
+            [Name("userid")] public string UserID { get; set; }
+            [Name("tweet-type")] public List<string> TweetType { get; set; }
+            [Name("save-content")] public List<string> Contents { get; set; }
 
             string _saveTo = null;
-            [Mapping("save-to")] public string SaveTo 
+            [Name("save-to")] public string SaveTo 
             {
                 get => _saveTo ?? @".\" + UserName;
                 set => _saveTo = value; 
             }
 
             DateTime? _starttime = null;
-            [Mapping("start-time")] public string StartTime 
+            [Name("start-time")] public string StartTime 
             {
                 get => _starttime.GetValueOrDefault().ToString("yyyy/MM/dd HH:mm:ss"); 
                 set => _starttime = value == null ? null : DateTime.Parse(value); 
             }
 
-            [Mapping("refresh")] public bool Refresh { get; set; }
+            [Name("refresh")] public bool Refresh { get; set; }
 
             public bool HasText => Contents.Any(_ => _.ToLower() == "text");
             public bool HasPhoto => Contents.Any(_ => _.ToLower() == "photo");

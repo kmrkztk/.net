@@ -10,6 +10,6 @@ namespace Lib
     [AttributeUsage(AttributeTargets.All)]
     public class CamelCaseNameAttribute : NameAttribute
     {
-        public override string GetValue(MemberInfo info) => info?.Name.ToCamelCase();
+        public override string GetName(MemberInfo info) => info?.Name.ToCamelCase();
     }
 }
