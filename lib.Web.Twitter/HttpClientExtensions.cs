@@ -12,6 +12,15 @@ namespace Lib.Web.Twitter
 {
     public static class HttpClientExtensions
     {
+        public static Json.Json GetJson(this HttpClient client, string requestUri) => GetJson(client, new Uri(requestUri));
+        public static Json.Json GetJson(this HttpClient client, string requestUri, CancellationToken cancellationToken) => GetJson(client, new Uri(requestUri), cancellationToken);
+        public static Json.Json GetJson(this HttpClient client, string requestUri, HttpCompletionOption completionOption) => GetJson(client, new Uri(requestUri), completionOption);
+        public static Json.Json GetJson(this HttpClient client, string requestUri, HttpCompletionOption completionOption, CancellationToken cancellationToken) => GetJson(client, new Uri(requestUri), completionOption, cancellationToken);
+        public static Json.Json GetJson(this HttpClient client, Uri requestUri) => GetJson(client, requestUri, CancellationToken.None);
+        public static Json.Json GetJson(this HttpClient client, Uri requestUri, CancellationToken cancellationToken) => GetJson(client, requestUri, HttpCompletionOption.ResponseContentRead, cancellationToken);
+        public static Json.Json GetJson(this HttpClient client, Uri requestUri, HttpCompletionOption completionOption) => GetJson(client, requestUri, completionOption, CancellationToken.None);
+        public static Json.Json GetJson(this HttpClient client, Uri requestUri, HttpCompletionOption completionOption, CancellationToken cancellationToken)
+            => Json.Json.Load(client.GetAsync(requestUri, completionOption, cancellationToken).Result.Content.ReadAsStream(cancellationToken));
         public static async Task<Json.Json> GetJsonAsync(this HttpClient client, string requestUri) => await GetJsonAsync(client, new Uri(requestUri));
         public static async Task<Json.Json> GetJsonAsync(this HttpClient client, string requestUri, CancellationToken cancellationToken) => await GetJsonAsync(client, new Uri(requestUri), cancellationToken);
         public static async Task<Json.Json> GetJsonAsync(this HttpClient client, string requestUri, HttpCompletionOption completionOption) => await GetJsonAsync(client, new Uri(requestUri), completionOption);
@@ -20,12 +29,7 @@ namespace Lib.Web.Twitter
         public static async Task<Json.Json> GetJsonAsync(this HttpClient client, Uri requestUri, CancellationToken cancellationToken) => await GetJsonAsync(client, requestUri, HttpCompletionOption.ResponseContentRead, cancellationToken);
         public static async Task<Json.Json> GetJsonAsync(this HttpClient client, Uri requestUri, HttpCompletionOption completionOption) => await GetJsonAsync(client, requestUri, completionOption, CancellationToken.None);
         public static async Task<Json.Json> GetJsonAsync(this HttpClient client, Uri requestUri, HttpCompletionOption completionOption, CancellationToken cancellationToken)
-        {
-            Console.WriteLine("[{0}]", requestUri.ToString());
-            var json = Json.Json.Load(await (await client.GetAsync(requestUri, completionOption, cancellationToken)).Content.ReadAsStreamAsync(cancellationToken));
-            Console.WriteLine(json.Unescape());
-            return json;
-        }
+            => Json.Json.Load(await (await client.GetAsync(requestUri, completionOption, cancellationToken)).Content.ReadAsStreamAsync(cancellationToken));
         public static async Task<Stream> DownloadAsync(this HttpClient client, string uri) => await DownloadAsync(client, uri, CancellationToken.None);
         public static async Task<Stream> DownloadAsync(this HttpClient client, string uri, CancellationToken cancellationToken) => await DownloadAsync(client, new Uri(uri), cancellationToken);
         public static async Task<Stream> DownloadAsync(this HttpClient client, Uri uri) => await DownloadAsync(client, uri, CancellationToken.None);

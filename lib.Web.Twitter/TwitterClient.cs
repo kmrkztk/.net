@@ -7,8 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Web;
+using Lib.Web.Twitter.Objects;
 
 namespace Lib.Web.Twitter
 {
@@ -32,14 +31,13 @@ namespace Lib.Web.Twitter
         public TwitterClient(string bearer, HttpMessageHandler handler) : this(bearer, handler, false) { }
         public TwitterClient(string bearer, HttpMessageHandler handler, bool disposeHandler) : base(handler, disposeHandler) =>
             DefaultRequestHeaders.Authorization = new("Bearer", bearer);
-
-        public async Task<Json.Json> GetJsonAsync(string url, CancellationToken cancel)
+        public async Task<Json.Json> GetJsonAsync(string url, CancellationToken cancel) => await Task.Run(() => GetJson(url, cancel), cancel);
+        public Json.Json GetJson(string url, CancellationToken cancel)
         {
-            var json = await HttpClientExtensions.GetJsonAsync(this, url, cancel);
+            var json = HttpClientExtensions.GetJson(this, url, cancel);
             if (json["errors"] != null) throw new TwitterApiException(json);
             return json;
         }
-
         public async Task<User> GetUserAsync(string name) => await GetUserAsync(name, CancellationToken.None);
         public async Task<User> GetUserAsync(string name, CancellationToken cancel) => new((await this.GetJsonAsync(Url.GetUser.ToString(name), cancel))?["data"]?.AsObject());
         public async Task<Timeline> GetTimelineAsync(string name) => await GetTimelineAsync(name, CancellationToken.None);
@@ -49,47 +47,14 @@ namespace Lib.Web.Twitter
         public async Task<Timeline> GetTimelineAsync(string name, TimelineOption options) => await GetTimelineAsync(name, options, CancellationToken.None);
         public async Task<Timeline> GetTimelineAsync(string name, TimelineOption options, CancellationToken cancel) => await GetTimelineAsync(await GetUserAsync(name, cancel), options, cancel);
         public async Task<Timeline> GetTimelineAsync(User user, TimelineOption options) => await GetTimelineAsync(user, options, CancellationToken.None);
-        public async Task<Timeline> GetTimelineAsync(User user, TimelineOption options, CancellationToken cancel)
+        public async Task<Timeline> GetTimelineAsync(User user, TimelineOption options, CancellationToken cancel) => new((await this.GetJsonAsync(Url.GetTimeline.ToString(user.Id, options), cancel)).AsObject()) { User = user, };
+        public async Task<(Tweet Tweet, Includes Includes)> GetTweetAsync(string id) => await GetTweetAsync(id, CancellationToken.None);
+        public async Task<(Tweet Tweet, Includes Includes)> GetTweetAsync(string id, CancellationToken cancel)
         {
-            var json = await this.GetJsonAsync(Url.GetTimeline.ToString(user.ID, options), cancel);
-            var medias = Tweet.Media.Of(json?["includes"]?["media"]?.AsArray()).ToDictionary(_ => _.Key);
-            return new Timeline(json["data"]?
-                .AsArray()
-                .Select(_ => _.AsObject())
-                .Select(_ => new Tweet(_, k =>
-                    !medias.ContainsKey(k) ? null :
-                    medias[k].IsPhoto ? medias[k] :
-                    medias[k].IsVideo ? GetTweetAsync(_["id"].Value, cancel).Result.Medias?.FirstOrDefault() : null)
-                ))
-            {
-                User = user,
-                Meta = new(json["meta"]?.AsObject()),
-            };
+            var json = await this.GetJsonAsync(Url.GetTweet.ToString(id, new TweetOption()), cancel);
+            return (Tweet.OfVer1(json.AsObject()), Includes.OfVer1(json.AsObject()));
         }
-        public async Task<Tweet> GetTweetAsync(string id, CancellationToken cancel)
-        {
-            var _ = await this.GetJsonAsync(Url.GetTweet.ToString(id, new()), cancel);
-            return new()
-            {
-                ID = _["id"].Value,
-                Text = (_["text"] ?? _["full_text"]).Unescape(),
-                Medias = _["extended_entities"]?["media"]?.AsArray()
-                        .Select(_ => new Tweet.Media()
-                        {
-                            ID = _["id"].Value,
-                            Type = _["type"].Value,
-                            Url =
-                                _["type"].Value == "photo" ? _["media_url"].Value :
-                                _["type"].Value == "video" ? _["video_info"]["variants"]
-                                    .AsArray()
-                                    .OrderBy(_ => _["bitrate"]?.Value ?? "a")
-                                    .FirstOrDefault()?["url"].Value :
-                                null,
-                        })
-                        .Where(_ => _.Url != null)
-                        .ToList(),
-            };
-        }
+
         /*
             public override User GetUser(string name, CancellationToken cancel)
             {

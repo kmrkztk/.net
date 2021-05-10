@@ -7,19 +7,25 @@ using System.Threading.Tasks;
 using Lib.Entity;
 using Lib.Json;
 
-namespace Lib.Web.Twitter
+namespace Lib.Web.Twitter.Objects
 {
     public class Timeline : IList<Tweet>
     {
         readonly List<Tweet> _tweets;
         public Tweet this[int index] { get => _tweets[index]; set => _tweets[index] = value; }
         public User User { get; init; }
+        public Includes Includes { get; init; }
         public Meta Meta { get; init; }
 
         public Timeline() => _tweets = new();
-        public Timeline(IEnumerable<Tweet> tweets) => _tweets = tweets.ToList();
-        public Timeline(JsonObject data) : this() { }
+        public Timeline(JsonObject json) : this() 
+        {
+            _tweets = json["data"]?.AsArray().Select(_ => _.Cast<Tweet>()).ToList();
+            Includes = json["includes"].Cast<Includes>();
+            Meta = json["meta"].Cast<Meta>();
+        }
 
+        #region IList
         public int IndexOf(Tweet item) => _tweets.IndexOf(item);
         public void Insert(int index, Tweet item) => _tweets.Insert(index, item);
         public void RemoveAt(int index) => _tweets.RemoveAt(index);
@@ -32,22 +38,13 @@ namespace Lib.Web.Twitter
         public bool IsReadOnly => false;
         public IEnumerator<Tweet> GetEnumerator() => _tweets.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        #endregion
     }
     public class Meta
     {
-        public int ResultCount { get; init; }
-        public ID OldestId { get; init; }
-        public ID NewestId { get; init; }
-        public string NextToken { get; init; }
-
-        public Meta() { }
-        public Meta(JsonObject meta)
-        {
-            if (meta == null) return;
-            NextToken = meta["next_token"]?.Value;
-            NewestId = meta["newest_id"]?.Value;
-            OldestId = meta["oldest_id"]?.Value;
-            ResultCount = int.Parse(meta["result_count"]?.Value ?? "0");
-        }
+        [SnakeCaseName] public int ResultCount { get; init; }
+        [SnakeCaseName] public ID OldestId { get; init; }
+        [SnakeCaseName] public ID NewestId { get; init; }
+        [SnakeCaseName] public string NextToken { get; init; }
     }
 }

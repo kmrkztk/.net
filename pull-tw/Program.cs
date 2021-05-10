@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using Lib;
 using Lib.Json;
 using Lib.Web.Twitter;
+using Lib.Text;
 
 namespace pull_tw
 {
@@ -29,14 +30,17 @@ namespace pull_tw
                 do
                 {
                     var timeline = client.GetTimelineAsync(target.UserName, option).Result;
+                    var medias = timeline.Includes.Medias.ToDictionary(_ => _.Key);
                     timeline.Foreach(_ =>
                     {
                         Console.WriteLine("saving... [{0}] {1}", _.ID, _.CreatedAt);
                         if (target.HasText) target.Download(_);
-                        _.Medias?
-                            .Where(_ => _ != null)
-                            .Where(_ => (_.IsPhoto && target.HasPhoto) || (_.IsVideo && target.HasVideo))
-                            .Foreach(_ => target.Download(_));
+                        _.Attachments?
+                            .MediaKeys?
+                            .Select(k => medias[k])
+                            .Select(m => m.IsVideo ? client.GetTweetAsync(_.ID).Result.Includes.Medias.FirstOrDefault() : m)
+                            .Where(m => (m.IsPhoto && target.HasPhoto) || (m.IsVideo && target.HasVideo))
+                            .Foreach(m => target.Download(m));
                     });
                     target.Download(timeline.Meta);
                     if (timeline.Meta.ResultCount == 0) break;

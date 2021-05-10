@@ -11,6 +11,7 @@ using Lib;
 using Lib.Entity;
 using Lib.Json;
 using Lib.Web.Twitter;
+using Lib.Web.Twitter.Objects;
 
 namespace pull_tw
 {
@@ -22,37 +23,33 @@ namespace pull_tw
             using var fs = new FileStream("pull-tw.settings.json", FileMode.Open);
             return Json.Load<Settings>(fs);
         }
-        [Name("bearer")] public string Bearer { get; set; }
-        [Name("access-key")] public string AccessKey { get; set; }
-        [Name("secret-key")] public string SecretKey { get; set; }
-        [Name("targets")]
-        public List<Target> Targets { get; set; }
+        [ChainCaseName] public string Bearer { get; set; }
+        [ChainCaseName] public string AccessKey { get; set; }
+        [ChainCaseName] public string SecretKey { get; set; }
+        [ChainCaseName] public List<Target> Targets { get; set; }
         public class Target
         {
-            [Name("username")] public string UserName { get; set; }
-            [Name("userid")] public string UserID { get; set; }
-            [Name("tweet-type")] public List<string> TweetType { get; set; }
-            [Name("save-content")] public List<string> Contents { get; set; }
-
+            [LowerName] public string UserName { get; set; }
+            [LowerName] public string UserID { get; set; }
+            [ChainCaseName] public List<string> TweetType { get; set; }
+            [ChainCaseName] public List<string> SaveContent { get; set; }
             string _saveTo = null;
-            [Name("save-to")] public string SaveTo 
+            [ChainCaseName] public string SaveTo 
             {
                 get => _saveTo ?? @".\" + UserName;
                 set => _saveTo = value; 
             }
-
             DateTime? _starttime = null;
-            [Name("start-time")] public string StartTime 
+            [ChainCaseName] public string StartTime 
             {
                 get => _starttime.GetValueOrDefault().ToString("yyyy/MM/dd HH:mm:ss"); 
                 set => _starttime = value == null ? null : DateTime.Parse(value); 
             }
+            [ChainCaseName] public bool Refresh { get; set; }
 
-            [Name("refresh")] public bool Refresh { get; set; }
-
-            public bool HasText => Contents.Any(_ => _.ToLower() == "text");
-            public bool HasPhoto => Contents.Any(_ => _.ToLower() == "photo");
-            public bool HasVideo => Contents.Any(_ => _.ToLower() == "video");
+            public bool HasText => SaveContent.Any(_ => _.ToLower() == "text");
+            public bool HasPhoto => SaveContent.Any(_ => _.ToLower() == "photo");
+            public bool HasVideo => SaveContent.Any(_ => _.ToLower() == "video");
             public bool HasMedia => HasPhoto || HasVideo;
             public bool HasReply => TweetType.Any(_ => _.ToLower() == "reply");
             public bool HasRetweet => TweetType.Any(_ => _.ToLower() == "retweet");
@@ -83,7 +80,7 @@ namespace pull_tw
                 var filename = SaveTo + "\\" + tweet.ID + ".txt";
                 File.WriteAllText(filename, tweet.Text);
             }
-            public void Download(Tweet.Media media)
+            public void Download(Media media)
             {
                 var regex = new Regex(@"\?.+$");
                 var filename = SaveTo + "\\" + media.ID + Path.GetExtension(regex.Replace(media.Url, ""));
