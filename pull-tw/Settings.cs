@@ -12,6 +12,7 @@ using Lib.Entity;
 using Lib.Jsons;
 using Lib.Web.Twitter;
 using Lib.Web.Twitter.Objects;
+using Lib.Web.Twitter.Options;
 
 namespace pull_tw
 {

@@ -17,7 +17,7 @@ namespace Lib.Entity
         public ID(decimal? value)
         {
             Value = value;
-            if (ValueOrZero != decimal.Truncate(ValueOrZero)) throw new ArgumentException(nameof(value));
+            if (ValueOrZero != decimal.Truncate(ValueOrZero)) throw new ArgumentException(null, nameof(value));
         }
         public ID(string value) : this(string.IsNullOrEmpty(value) ? null : decimal.Parse(value)) { }
         public override string ToString() => Value?.ToString() ?? string.Empty;

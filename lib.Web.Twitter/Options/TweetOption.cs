@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lib.Web.Twitter
+namespace Lib.Web.Twitter.Options
 {
     public class TweetOption
     {

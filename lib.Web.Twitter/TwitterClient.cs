@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using Lib.Jsons;
 using Lib.Web.Twitter.Objects;
+using Lib.Web.Twitter.Options;
 
 namespace Lib.Web.Twitter
 {
