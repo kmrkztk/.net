@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Lib.Reflection;
 
-namespace Lib.Json
+namespace Lib.Jsons
 {
     public class JsonValue : Json
     {
@@ -45,11 +46,7 @@ namespace Lib.Json
             string.Format("{0}{1}{0}", 
                 ValueType == JsonValueType.String ? BlockChar.ToString() : "", setting.Escape ? Escape(_value) : _value
             );
-        public override object Cast(Type type)
-        {
-            if (type == this.GetType()) return this;
-            return System.Convert.ChangeType(_value, type);
-        }
+        public override dynamic Cast(Type type) => Type.GetTypeCode(type) == TypeCode.Object ? type.Cast(_value) : Convert.ChangeType(_value, type);
         public override IEnumerable<Json> Find(params string[] keys) 
         {
             if (keys.Length == 0) yield return this;

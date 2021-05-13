@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using Lib;
-using Lib.Json;
+using Lib.Jsons;
 using Lib.Web.Twitter;
 using Lib.Text;
 
@@ -30,13 +30,14 @@ namespace pull_tw
                 do
                 {
                     var timeline = client.GetTimelineAsync(target.UserName, option).Result;
-                    var medias = timeline.Includes.Medias.ToDictionary(_ => _.Key);
+                    var medias = timeline.Includes.Medias?.ToDictionary(_ => _.Key) ?? new();
                     timeline.Foreach(_ =>
                     {
                         Console.WriteLine("saving... [{0}] {1}", _.ID, _.CreatedAt);
                         if (target.HasText) target.Download(_);
                         _.Attachments?
                             .MediaKeys?
+                            .Where(k => medias.ContainsKey(k))
                             .Select(k => medias[k])
                             .Select(m => m.IsVideo ? client.GetTweetAsync(_.ID).Result.Includes.Medias.FirstOrDefault() : m)
                             .Where(m => (m.IsPhoto && target.HasPhoto) || (m.IsVideo && target.HasVideo))

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Lib.Reflection;
 
-namespace Lib.Json
+namespace Lib.Jsons
 {
     public class JsonObject : Json, IDictionary<string, Json>
     {
@@ -62,7 +62,7 @@ namespace Lib.Json
             s.Append(EndChar);
             return s.ToString();
         }
-        public override object Cast(Type type)
+        public override dynamic Cast(Type type)
         {
             if (type == this.GetType()) return this;
             var instance = type.GetConstructor(Array.Empty<Type>()).Invoke(Array.Empty<object>());

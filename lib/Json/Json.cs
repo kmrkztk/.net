@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections;
 
-namespace Lib.Json
+namespace Lib.Jsons
 {
     public enum JsonValueType
     {
@@ -94,11 +94,11 @@ namespace Lib.Json
         public abstract string Format(JsonFormatSettings setting);
         public string Escape() => Escape(this);
         public string Unescape() => Unescape(this);
-        public T Cast<T>() => (T)Cast(typeof(T));
         public JsonObject AsObject() => (JsonObject)this;
         public JsonArray AsArray() => (JsonArray)this;
         public JsonValue AsValue() => (JsonValue)this;
-        public abstract object Cast(Type type);
+        public virtual T Cast<T>() => (T)Cast(typeof(T));
+        public abstract dynamic Cast(Type type);
         public abstract IEnumerable<Json> Find(params string[] keys);
         protected static string TrimBlock(string value) => value.Trim(BlockChar);
         public override string ToString() => Format();

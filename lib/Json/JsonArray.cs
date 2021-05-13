@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lib.Json
+namespace Lib.Jsons
 {
     public class JsonArray : Json, IList<Json>
     {
@@ -52,7 +52,7 @@ namespace Lib.Json
             s.Append(EndChar);
             return s.ToString();
         }
-        public override object Cast(Type type)
+        public override dynamic Cast(Type type)
         {
             if (type == this.GetType()) return this;
             if (!type.IsGenericType || type.GetGenericTypeDefinition() != typeof(List<>)) throw new ArgumentException(null, nameof(type));

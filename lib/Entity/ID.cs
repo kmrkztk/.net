@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,12 +7,17 @@ using System.Threading.Tasks;
 
 namespace Lib.Entity
 {
+    [TypeConverter(typeof(IDTypeConverter))]
     public struct ID : IComparable<ID>, IEquatable<ID>, IConvertible
     {
         public static ID Null => new("") { Value = null };
         public decimal? Value { get; private set; }
         public decimal ValueOrZero => Value ?? decimal.Zero;
-        public ID(decimal? value) => Value = value;
+        public ID(decimal? value)
+        {
+            Value = value;
+            if (ValueOrZero != decimal.Truncate(ValueOrZero)) throw new ArgumentException(nameof(value));
+        }
         public ID(string value) : this(string.IsNullOrEmpty(value) ? null : decimal.Parse(value)) { }
         public override string ToString() => Value?.ToString() ?? string.Empty;
         public int CompareTo(ID other)
@@ -39,7 +45,7 @@ namespace Lib.Entity
         public sbyte ToSByte(IFormatProvider provider) => decimal.ToSByte(ValueOrZero);
         public float ToSingle(IFormatProvider provider) => decimal.ToSingle(ValueOrZero);
         public string ToString(IFormatProvider provider) => Value?.ToString(provider);
-        public object ToType(Type conversionType, IFormatProvider provider) => throw new NotImplementedException();
+        public object ToType(Type conversionType, IFormatProvider provider) => TypeDescriptor.GetConverter(typeof(ID)).ConvertTo(this, conversionType);
         public ushort ToUInt16(IFormatProvider provider) => decimal.ToUInt16(ValueOrZero);
         public uint ToUInt32(IFormatProvider provider) => decimal.ToUInt32(ValueOrZero);
         public ulong ToUInt64(IFormatProvider provider) => decimal.ToUInt64(ValueOrZero);
@@ -56,7 +62,25 @@ namespace Lib.Entity
         public static ID operator --(ID src) => new(src.Value - 1);
         public static implicit operator ID(string value) => new(value);
         public static implicit operator ID(decimal? value) => new(value);
+        public static implicit operator ID(decimal value) => new(value);
+        public static implicit operator ID(long value) => new(value);
+        public static implicit operator ID(int value) => new(value);
+        public static implicit operator ID(short value) => new(value);
+        public static implicit operator ID(byte value) => new(value);
+        public static implicit operator ID(ulong value) => new(value);
+        public static implicit operator ID(uint value) => new(value);
+        public static implicit operator ID(ushort value) => new(value);
+        public static implicit operator ID(sbyte value) => new(value);
         public static implicit operator string(ID value) => value.ToString();
         public static implicit operator decimal?(ID value) => value.Value;
+        public static implicit operator decimal(ID value) => value.ValueOrZero;
+        public static implicit operator long(ID value) => decimal.ToInt64(value.ValueOrZero);
+        public static implicit operator int(ID value) => decimal.ToInt32(value.ValueOrZero);
+        public static implicit operator short(ID value) => decimal.ToInt16(value.ValueOrZero);
+        public static implicit operator byte(ID value) => decimal.ToByte(value.ValueOrZero);
+        public static implicit operator ulong(ID value) => decimal.ToUInt64(value.ValueOrZero);
+        public static implicit operator uint(ID value) => decimal.ToUInt32(value.ValueOrZero);
+        public static implicit operator ushort(ID value) => decimal.ToUInt16(value.ValueOrZero);
+        public static implicit operator sbyte(ID value) => decimal.ToSByte(value.ValueOrZero);
     }
 }

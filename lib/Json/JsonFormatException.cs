@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.Serialization;
 using System.Security;
 
-namespace Lib.Json
+namespace Lib.Jsons
 {
     public class JsonFormatException : Exception
     {

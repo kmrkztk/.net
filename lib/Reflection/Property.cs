@@ -20,18 +20,17 @@ namespace Lib.Reflection
             Info = pi ?? throw new ArgumentNullException(nameof(pi));
         }
         public object GetValue() => Info.GetValue(Instance);
-        public void SetValue(object value) => Info.SetValue(Instance, ConvertType(value, PropertyType));
+        public void SetValue(object value) => Info.SetValue(Instance, PropertyType.Cast(value));
         public void AddValue(object value)
         {
             if (IsList)
             {
                 var list = (GetValue() as IList) ?? Activator.CreateInstance(PropertyType) as IList;
-                list.Add(ConvertType(value, PropertyType.GetGenericArguments()[0]));
+                list.Add(PropertyType.GetGenericArguments()[0].Cast(value));
                 SetValue(list);
             }
             else SetValue(value);
         }
-        protected static object ConvertType(object value, Type type) => value == null ? null : value.GetType() == type ? value : Convert.ChangeType(value, type);
         public override string ToString() => string.Format("{0}.{1} = {2}", Instance.GetType().Name, Info.Name, Info.GetValue(Instance));
 
         public static IEnumerable<Property> GetProperties(object instance) => instance.GetType()
