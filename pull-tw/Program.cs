@@ -11,6 +11,7 @@ using Lib;
 using Lib.Jsons;
 using Lib.Web.Twitter;
 using Lib.Text;
+using Lib.Entity;
 
 namespace pull_tw
 {
@@ -27,11 +28,18 @@ namespace pull_tw
                 Console.WriteLine("download '{0}'...", target.UserName);
                 target.CreateSavingTo();
                 var option = target.Option;
+                var old = ID.Max;
+                var count = 0;
                 do
                 {
                     var timeline = client.GetTimelineAsync(target.UserName, option).Result;
-                    var medias = timeline.Includes.Medias?.ToDictionary(_ => _.Key) ?? new();
-                    timeline.Foreach(_ =>
+                    var medias = timeline.Includes?.Medias?.ToDictionary(_ => _.Key) ?? new();
+                    timeline
+                    .Where(_ =>
+                        (target.HasTweet && !_.IsReply && !_.IsRetweet) ||
+                        (target.HasReply && _.IsReply) ||
+                        (target.HasRetweet && _.IsRetweet))
+                    .Foreach(_ =>
                     {
                         Console.WriteLine("saving... [{0}] {1}", _.ID, _.CreatedAt);
                         if (target.HasText) target.Download(_);
@@ -44,10 +52,20 @@ namespace pull_tw
                             .Foreach(m => target.Download(m));
                     });
                     target.Download(timeline.Meta);
-                    if (timeline.Meta.ResultCount == 0) break;
-                    option.EndTime = timeline.Min(_ => _.CreatedAt)?.AddSeconds(-1);
+                    Console.WriteLine(timeline.Meta);
+                    if (timeline.Meta?.OldestId != ID.Null) 
+                        old = old < timeline.Meta.OldestId ? old : timeline.Meta.OldestId;
+                    count += timeline.Meta?.ResultCount ?? 0;
+                    option.NextToken = timeline.Meta?.NextToken;
+                    if (string.IsNullOrEmpty(option.NextToken))
+                    {
+                        if (old == ID.Max) break;
+                        if (option.UntilId == old) break;
+                        option.UntilId = old;
+                    }
                 }
                 while (true);
+                Console.WriteLine("saved {0} tweets.", count);
             });
 #if DEBUG
             ConsoleEx.Pause();

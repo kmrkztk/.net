@@ -51,6 +51,7 @@ namespace pull_tw
             public bool HasPhoto => SaveContent.Any(_ => _.ToLower() == "photo");
             public bool HasVideo => SaveContent.Any(_ => _.ToLower() == "video");
             public bool HasMedia => HasPhoto || HasVideo;
+            public bool HasTweet => TweetType.Any(_ => _.ToLower() == "tweet");
             public bool HasReply => TweetType.Any(_ => _.ToLower() == "reply");
             public bool HasRetweet => TweetType.Any(_ => _.ToLower() == "retweet");
             public bool HasLike => TweetType.Any(_ => _.ToLower() == "like");
@@ -64,7 +65,11 @@ namespace pull_tw
             {
                 MaxResult = 100,
                 Expansions = HasMedia ? ExpansionsOptions.AttachmentsMediaKeys : ExpansionsOptions.None,
-                TweetFields = (HasMedia ? TweetFieldsOptions.Attachments : TweetFieldsOptions.None) | TweetFieldsOptions.CreatedAt,
+                TweetFields = (HasMedia ? TweetFieldsOptions.Attachments : TweetFieldsOptions.None) 
+                    | TweetFieldsOptions.InReplyToUserId
+                    | TweetFieldsOptions.ReplySettings
+                    | TweetFieldsOptions.ReferencedTweets
+                    | TweetFieldsOptions.CreatedAt,
                 MediaFields = HasMedia ? MediaFieldsOptions.Type | MediaFieldsOptions.Url : MediaFieldsOptions.None,
                 //Exclude =
                 //(HasReply ? TimelineOption.ExcludeOptions.None : TimelineOption.ExcludeOptions.Replies) |
@@ -74,16 +79,16 @@ namespace pull_tw
                 StartTime = _starttime,
             };
             public void CreateSavingTo() => Directory.CreateDirectory(SaveTo);
-
+            public string GetSavingPath(object name, string ext) => string.Format(@"{0}\{1}{2}", SaveTo, name, ext);
             public void Download(Tweet tweet)
             {
-                var filename = SaveTo + "\\" + tweet.ID + ".txt";
+                var filename = GetSavingPath(tweet.ID, ".txt");
                 File.WriteAllText(filename, tweet.Text);
             }
             public void Download(Media media)
             {
                 var regex = new Regex(@"\?.+$");
-                var filename = SaveTo + "\\" + media.ID + Path.GetExtension(regex.Replace(media.Url, ""));
+                var filename = GetSavingPath(media.ID, Path.GetExtension(regex.Replace(media.Url, "")));
                 using var client = new HttpClient();
                 client.DownloadAsync(media.Url, filename).Wait();
             }
@@ -91,7 +96,7 @@ namespace pull_tw
             {
                 if (NewestId > meta?.NewestId) return;
                 _newest = meta?.NewestId;
-                var filename = SaveTo + "\\" + UserName + ".newest.txt";
+                var filename = GetSavingPath(UserName, ".newest.txt");
                 File.WriteAllText(filename, _newest);
             }
         }

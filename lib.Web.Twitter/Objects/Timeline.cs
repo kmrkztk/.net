@@ -20,9 +20,9 @@ namespace Lib.Web.Twitter.Objects
         public Timeline() => _tweets = new();
         public Timeline(JsonObject json) : this() 
         {
-            _tweets = json["data"]?.AsArray().Select(_ => _.Cast<Tweet>()).ToList();
-            Includes = json["includes"].Cast<Includes>();
-            Meta = json["meta"].Cast<Meta>();
+            _tweets = json["data"]?.AsArray().Select(_ => _.Cast<Tweet>()).ToList() ?? new();
+            Includes = json["includes"]?.Cast<Includes>();
+            Meta = json["meta"]?.Cast<Meta>();
         }
 
         #region IList
@@ -46,5 +46,6 @@ namespace Lib.Web.Twitter.Objects
         [SnakeCaseName] public ID OldestId { get; init; }
         [SnakeCaseName] public ID NewestId { get; init; }
         [SnakeCaseName] public string NextToken { get; init; }
+        public override string ToString() => string.Format("count:{0} newest:{1} oldesr:{2} next:{3}", ResultCount, NewestId, OldestId, NextToken);
     }
 }

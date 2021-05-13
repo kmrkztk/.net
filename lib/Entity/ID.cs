@@ -11,6 +11,7 @@ namespace Lib.Entity
     public struct ID : IComparable<ID>, IEquatable<ID>, IConvertible
     {
         public static ID Null => new("") { Value = null };
+        public static ID Max => new(decimal.MaxValue);
         public decimal? Value { get; private set; }
         public decimal ValueOrZero => Value ?? decimal.Zero;
         public ID(decimal? value)

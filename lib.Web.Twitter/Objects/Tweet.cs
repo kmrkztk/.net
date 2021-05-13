@@ -30,13 +30,15 @@ namespace Lib.Web.Twitter.Objects
         [SnakeCaseName] public string Lang { get; set; }
         [SnakeCaseName] public bool PossiblySensitive { get; set; }
         [SnakeCaseName] public Withheld Withheld { get; set; }
+        public bool IsReply => ReferencedTweets?.Any(_ => _.IsRepliedTo) ?? false;
+        public bool IsRetweet => ReferencedTweets?.Any(_ => _.IsRetweeted) ?? false;
+
         public override string ToString() => string.Format("[{0:yyyy/MM/dd HH:mm:ss}] ({1}){2}", CreatedAt, ID, Text);
         public static Tweet OfVer1(JsonObject json) => new()
         {
             ID = json["id"].Value,
             Text = (json["text"] ?? json["full_text"]).Unescape(),
         };
-
         public class Attachment
         {
             [SnakeCaseName] public List<string> MediaKeys { get; set; }
@@ -66,8 +68,11 @@ namespace Lib.Web.Twitter.Objects
         public class ReferencedTweet
         {
             public const string Retweeted = "retweeted";
-            public const string Quoted = "quoted";
             public const string RepliedTo = "replied_to";
+            public const string Quoted = "quoted";
+            public bool IsRetweeted => Type == Retweeted;
+            public bool IsRepliedTo => Type == RepliedTo;
+            public bool IsQuoted => Type == Quoted;
             [LowerName] public string Type { get; set; }
             [LowerName] public ID ID { get; set; }
         }

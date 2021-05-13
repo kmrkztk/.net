@@ -46,7 +46,7 @@ namespace Lib.Jsons
             string.Format("{0}{1}{0}", 
                 ValueType == JsonValueType.String ? BlockChar.ToString() : "", setting.Escape ? Escape(_value) : _value
             );
-        public override dynamic Cast(Type type) => Type.GetTypeCode(type) == TypeCode.Object ? type.Cast(_value) : Convert.ChangeType(_value, type);
+        public override dynamic Cast(Type type) => type.Cast(_value);
         public override IEnumerable<Json> Find(params string[] keys) 
         {
             if (keys.Length == 0) yield return this;
