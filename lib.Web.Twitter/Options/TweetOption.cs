@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Lib.Reflection;
 
 namespace Lib.Web.Twitter.Options
 {
-    public class TweetOption
+    public class TweetOption : Option
     {
-        public override string ToString() =>
-            "trim_user=true" +
-            "&include_my_retweet=false" +
-            "&include_entities=true" +
-            "&tweet_mode=extended"
-            ;
+        [SnakeCaseName] [LowerFormat] public bool? TrimUser { get; set; } = true;
+        [SnakeCaseName] [LowerFormat] public bool? IncludeMyRetweet { get; set; } = false;
+        [SnakeCaseName] [LowerFormat] public bool? IncludeEntities { get; set; } = true;
+        [SnakeCaseName] [FlagsFormat] public TweetModes TweetMode { get; set; } = TweetModes.Extended;
     }
 }

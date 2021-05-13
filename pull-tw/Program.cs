@@ -23,6 +23,7 @@ namespace pull_tw
                 Console.WriteLine("download '{0}'...", target.UserName);
                 target.CreateSavingTo();
                 var option = target.Option;
+                var o = new Lib.Web.Twitter.Options.TweetOption();
                 var old = ID.Max;
                 var count = 0;
                 string path(object name, string ext) => string.Format(@"{0}\{1}{2}", target.SaveTo, name, ext);

@@ -42,7 +42,7 @@ namespace Lib.Web.Twitter
         public Json GetJson(string url, CancellationToken cancel)
         {
             var json = _client.GetJson(url, cancel);
-            if (json["errors"] != null) throw new TwitterApiException(json);
+            if (json is JsonObject && json["errors"] != null) throw new TwitterApiException(json);
             return json;
         }
         public async Task<User> GetUserAsync(string name) => await GetUserAsync(name, CancellationToken.None);
@@ -61,15 +61,7 @@ namespace Lib.Web.Twitter
             var json = await this.GetJsonAsync(Url.GetTweet.ToString(id, new TweetOption()), cancel);
             return (Tweet.OfVer1(json.AsObject()), Includes.OfVer1(json.AsObject()));
         }
+        public async Task<Json> GetLikes(FavoritesOption options) => await GetLikes(options, CancellationToken.None);
         public async Task<Json> GetLikes(FavoritesOption options, CancellationToken cancel) => await GetJsonAsync(Url.GetFavorite.ToString(options), cancel);
-    }
-    public class FavoritesOption
-    {
-        [SnakeCaseName] public string UserId { get; set; }
-        [SnakeCaseName] public string ScreenName { get; set; }
-        [SnakeCaseName] public int? Count { get; set; }
-        [SnakeCaseName] public Lib.Entity.ID? SinceId { get; set; }
-        [SnakeCaseName] public Lib.Entity.ID? MaxId { get; set; }
-        [SnakeCaseName] public bool? IncludeEntities { get; set; }
     }
 }

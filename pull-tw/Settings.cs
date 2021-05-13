@@ -67,7 +67,7 @@ namespace pull_tw
             }
             public TimelineOption Option => new()
             {
-                MaxResult = 100,
+                MaxResults = 100,
                 Expansions = HasMedia ? ExpansionsOptions.AttachmentsMediaKeys : ExpansionsOptions.None,
                 TweetFields = (HasMedia ? TweetFieldsOptions.Attachments : TweetFieldsOptions.None) 
                     | TweetFieldsOptions.InReplyToUserId
