@@ -23,6 +23,7 @@ namespace Lib.Web.Twitter
             public static Url GetUser     => Ver2("/users/by/username/{0}");
             public static Url GetTimeline => Ver2("/users/{0}/tweets?{1}");
             public static Url GetTweet    => Ver1("/statuses/show.json?id={0}&{1}");
+            public static Url GetFavorite => Ver1("/favorites/list.json?{0}");
             readonly string _format;
             public Url(decimal version, string path) => _format = string.Format("{0}{1}/{2}{3}", Scheme, Domain, version, path);
             public override string ToString() => _format;
@@ -59,5 +60,15 @@ namespace Lib.Web.Twitter
             var json = await this.GetJsonAsync(Url.GetTweet.ToString(id, new TweetOption()), cancel);
             return (Tweet.OfVer1(json.AsObject()), Includes.OfVer1(json.AsObject()));
         }
+        public async Task<Json> GetLikes(FavoritesOption options, CancellationToken cancel) => await GetJsonAsync(Url.GetFavorite.ToString(options), cancel);
+    }
+    public class FavoritesOption
+    {
+        [SnakeCaseName] public string UserId { get; set; }
+        [SnakeCaseName] public string ScreenName { get; set; }
+        [SnakeCaseName] public int? Count { get; set; }
+        [SnakeCaseName] public Lib.Entity.ID? SinceId { get; set; }
+        [SnakeCaseName] public Lib.Entity.ID? MaxId { get; set; }
+        [SnakeCaseName] public bool? IncludeEntities { get; set; }
     }
 }

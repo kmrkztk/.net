@@ -11,13 +11,13 @@ namespace Lib.Web.Twitter.Objects
     {
         [LowerName] public List<User> Users { get; set; }
         [LowerName] public List<Tweet> Tweets { get; set; }
-        [LowerName] public List<Media> Medias { get; set; }
+        [LowerName] public List<Media> Media { get; set; }
         [LowerName] public List<Poll> Polls { get; set; }
         [LowerName] public List<Place> Places { get; set; }
 
         public static Includes OfVer1(JsonObject json) => new()
         {
-            Medias = json["extended_entities"]?["media"]?.AsArray()
+            Media = json["extended_entities"]?["media"]?.AsArray()
                     .Select(_ => new Media()
                     {
                         ID = _["id"].Value,

@@ -57,10 +57,13 @@ namespace pull_tw
             public bool HasLike => TweetType.Any(_ => _.ToLower() == "like");
 
             ID? _newest = null;
-            public ID NewestId => _newest ??=
-                File.Exists(SaveTo + "\\" + UserName + ".newest.txt") ?
-                File.ReadAllText(SaveTo + "\\" + UserName + ".newest.txt") : null;
-
+            public ID? NewestId
+            {
+                get => _newest ??=
+                    File.Exists(SaveTo + "\\" + UserName + ".newest.txt") ?
+                    File.ReadAllText(SaveTo + "\\" + UserName + ".newest.txt") : null;
+                set => _newest = value;
+            }
             public TimelineOption Option => new()
             {
                 MaxResult = 100,
@@ -79,26 +82,6 @@ namespace pull_tw
                 StartTime = _starttime,
             };
             public void CreateSavingTo() => Directory.CreateDirectory(SaveTo);
-            public string GetSavingPath(object name, string ext) => string.Format(@"{0}\{1}{2}", SaveTo, name, ext);
-            public void Download(Tweet tweet)
-            {
-                var filename = GetSavingPath(tweet.ID, ".txt");
-                File.WriteAllText(filename, tweet.Text);
-            }
-            public void Download(Media media)
-            {
-                var regex = new Regex(@"\?.+$");
-                var filename = GetSavingPath(media.ID, Path.GetExtension(regex.Replace(media.Url, "")));
-                using var client = new HttpClient();
-                client.DownloadAsync(media.Url, filename).Wait();
-            }
-            public void Download(Meta meta)
-            {
-                if (NewestId > meta?.NewestId) return;
-                _newest = meta?.NewestId;
-                var filename = GetSavingPath(UserName, ".newest.txt");
-                File.WriteAllText(filename, _newest);
-            }
         }
     }
 }

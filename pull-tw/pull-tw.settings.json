@@ -20,11 +20,10 @@
 			"save-to": ".\\"
 		},
 		{
-			"refresh": true,
 			"username": "Twitter",
 			"tweet-type": [
 				"tweet",
-				"",
+				"like",
 				"retweet"
 			],
 			"save-content": [
