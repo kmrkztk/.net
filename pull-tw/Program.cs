@@ -36,12 +36,6 @@ namespace pull_tw
                         target.IsLikes ? twitter.GetLikesAsync((TimelineOption_Ver1)option).Result :
                         null;
                     var meta = tweets?.Meta;
-                    if (meta.IsEmpty && retry < 3)
-                    {
-                        Console.WriteLine("retry");
-                        continue;
-                    }
-                    retry = 0;
                     tweets?
                     .Where(_ =>
                         (target.HasTweet && !_.IsReply && !_.IsRetweet) ||
@@ -77,6 +71,14 @@ namespace pull_tw
                     }
                     count += meta?.ResultCount ?? 0;
                     Console.WriteLine("next? {0}", meta);
+                    if (meta.IsEmpty && retry < settings.Retry)
+                    {
+                        retry++;
+                        Console.WriteLine("retry");
+                        continue;
+                    }
+                    else if (meta.IsEmpty) break;
+                    else retry = 0;
                     if (!option.Next(meta)) break;
                 }
                 while (true);

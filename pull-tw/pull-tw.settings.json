@@ -2,6 +2,7 @@
 	"bearer": "AAAAAAAAAAAAAAAAAAAAAEvyOgEAAAAALs4sGxcBrM2XSciu7jLTT03nCNU%3DgSWssI9KOcXOOY7BKdhSL0pCfknjp6F4lZOPbwuLoU7ZNxVl8D",
 	"access-key": "",
 	"secret-key": "",
+	"retry": 1,
 	"targets": [
 		{
 			"username": "",
@@ -21,7 +22,6 @@
 			"save-to": ".\\"
 		},
 		{
-			"refresh": true,
 			"username": "Twitter",
 			"tweet-type": [
 				"tweet",

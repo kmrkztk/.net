@@ -26,6 +26,7 @@ namespace pull_tw
         [ChainCaseName] public string Bearer { get; set; }
         [ChainCaseName] public string AccessKey { get; set; }
         [ChainCaseName] public string SecretKey { get; set; }
+        [ChainCaseName] public int Retry { get; set; }
         [ChainCaseName] public List<Target> Targets { get; set; }
         public class Target
         {
