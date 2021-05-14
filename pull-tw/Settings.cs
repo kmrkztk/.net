@@ -16,7 +16,6 @@ using Lib.Web.Twitter.Options;
 
 namespace pull_tw
 {
-
     class Settings
     {
         public static Settings Load()
@@ -32,12 +31,13 @@ namespace pull_tw
         {
             [LowerName] public string UserName { get; set; }
             [LowerName] public string UserID { get; set; }
-            [ChainCaseName] public List<string> TweetType { get; set; }
-            [ChainCaseName] public List<string> SaveContent { get; set; }
+            [LowerName] public string Kind { get; set; }
+            [ChainCaseName] public List<string> TweetType { get; set; } = new() { "tweet", };
+            [ChainCaseName] public List<string> SaveContent { get; set; } = new() { "text", };
             string _saveTo = null;
             [ChainCaseName] public string SaveTo 
             {
-                get => _saveTo ?? @".\" + UserName;
+                get => _saveTo ?? @".\" + UserName + (string.IsNullOrEmpty(Kind) ? "" : ("." + Kind));
                 set => _saveTo = value; 
             }
             DateTime? _starttime = null;
@@ -48,14 +48,21 @@ namespace pull_tw
             }
             [ChainCaseName] public bool Refresh { get; set; }
 
-            public bool HasText => SaveContent.Any(_ => _.ToLower() == "text");
-            public bool HasPhoto => SaveContent.Any(_ => _.ToLower() == "photo");
-            public bool HasVideo => SaveContent.Any(_ => _.ToLower() == "video");
-            public bool HasMedia => HasPhoto || HasVideo;
-            public bool HasTweet => TweetType.Any(_ => _.ToLower() == "tweet");
-            public bool HasReply => TweetType.Any(_ => _.ToLower() == "reply");
-            public bool HasRetweet => TweetType.Any(_ => _.ToLower() == "retweet");
-            public bool HasLike => TweetType.Any(_ => _.ToLower() == "like");
+            public bool HasSaveContent(string type) => SaveContent.Any(_ => _.ToLower() == type);
+            public bool HasText => HasSaveContent("text");
+            public bool HasPhoto => HasSaveContent("photo");
+            public bool HasVideo => HasSaveContent("video");
+            public bool HasGif => HasSaveContent("gif");
+            public bool HasMedia => HasPhoto || HasVideo || HasGif;
+            
+            public bool HasType(string type) => TweetType.Any(_ => _.ToLower() == type);
+            public bool HasTweet => HasType("tweet");
+            public bool HasReply => HasType("reply");
+            public bool HasRetweet => HasType("retweet");
+
+            public bool IsTimeline => string.IsNullOrEmpty(Kind) || Kind.ToLower() == "timeline";
+            public bool IsLikes => Kind?.ToLower() == "likes";
+            public bool IsMessages => Kind?.ToLower() == "messages";
 
             ID? _newest = null;
             public ID? NewestId
@@ -65,24 +72,31 @@ namespace pull_tw
                     File.ReadAllText(SaveTo + "\\" + UserName + ".newest.txt") : null;
                 set => _newest = value;
             }
-            public TimelineOption Option => new()
-            {
-                MaxResults = 100,
-                Expansions = HasMedia ? ExpansionsOptions.AttachmentsMediaKeys : ExpansionsOptions.None,
-                TweetFields = (HasMedia ? TweetFieldsOptions.Attachments : TweetFieldsOptions.None) 
-                    | TweetFieldsOptions.InReplyToUserId
-                    | TweetFieldsOptions.ReplySettings
-                    | TweetFieldsOptions.ReferencedTweets
-                    | TweetFieldsOptions.CreatedAt,
-                MediaFields = HasMedia ? MediaFieldsOptions.Type | MediaFieldsOptions.Url : MediaFieldsOptions.None,
-                //Exclude =
-                //(HasReply ? TimelineOption.ExcludeOptions.None : TimelineOption.ExcludeOptions.Replies) |
-                //(HasRetweet ? TimelineOption.ExcludeOptions.None : TimelineOption.ExcludeOptions.Retweets) |
-                //TimelineOption.ExcludeOptions.None,
-                SinceId = Refresh ? ID.Null : NewestId,
-                StartTime = _starttime,
-            };
-            public void CreateSavingTo() => Directory.CreateDirectory(SaveTo);
+            public INextOption Option =>
+                IsTimeline ? 
+                new TimelineOption()
+                {
+                    MaxResults = 100,
+                    Expansions = HasMedia ? ExpansionsOptions.AttachmentsMediaKeys : ExpansionsOptions.None,
+                    TweetFields = (HasMedia ? TweetFieldsOptions.Attachments : TweetFieldsOptions.None) 
+                        | TweetFieldsOptions.InReplyToUserId
+                        | TweetFieldsOptions.ReplySettings
+                        | TweetFieldsOptions.ReferencedTweets
+                        | TweetFieldsOptions.CreatedAt,
+                    MediaFields = HasMedia ? MediaFieldsOptions.Type | MediaFieldsOptions.Url : MediaFieldsOptions.None,
+                    SinceId = Refresh ? ID.Null : NewestId,
+                    StartTime = _starttime,
+                } : 
+                IsLikes ?
+                new TimelineOption_Ver1()
+                {
+                    Count = 100,
+                    IncludeEntities = true,
+                    SinceId = Refresh ? ID.Null : NewestId,
+                    TweetMode = TweetModes.Extended,
+                    ScreenName = UserName,
+                } :
+                null;
         }
     }
 }

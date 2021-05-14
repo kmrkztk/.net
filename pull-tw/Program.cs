@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Lib;
 using Lib.Web.Twitter;
 using Lib.Web.Twitter.Objects;
+using Lib.Web.Twitter.Options;
 using Lib.Entity;
 
 namespace pull_tw
@@ -15,77 +16,68 @@ namespace pull_tw
         static void Main()
         {
             var settings = Settings.Load();
-            using var client = new TwitterClient(settings.Bearer);
+            using var client = new HttpClient();
+            var twitter = new TwitterClient(client, settings.Bearer);
             settings.Targets
                 .Where(_ => !string.IsNullOrEmpty(_.UserName))
                 .Foreach(target =>
             {
-                Console.WriteLine("download '{0}'...", target.UserName);
-                target.CreateSavingTo();
-                var option = target.Option;
-                var o = new Lib.Web.Twitter.Options.TweetOption();
-                var old = ID.Max;
-                var count = 0;
+                Console.WriteLine("pull '{0}'...", target.UserName);
                 string path(object name, string ext) => string.Format(@"{0}\{1}{2}", target.SaveTo, name, ext);
-                void save(Tweet tweet)
-                {
-                    var text = tweet.Text
-                            .Replace("\r", " ")
-                            .Replace("\n", " ");
-                    Console.WriteLine("saving... tweet [{0}] at {1} '{2}'",
-                        tweet.ID,
-                        tweet.CreatedAt,
-                        text.Length > 20 ? (text[0..20] + "...") : text);
-                    File.WriteAllText(path(tweet.ID, ".txt"), tweet.Text);
-                }
-                void download(Media media)
-                {
-                    Console.WriteLine("downloading... [{0}] '{1}'", media.ID, media.Url);
-                    var regex = new Regex(@"\?.+$");
-                    var filename = path(media.ID, Path.GetExtension(regex.Replace(media.Url, "")));
-                    using var client = new HttpClient();
-                    client.DownloadAsync(media.Url, filename).Wait();
-                }
-                void meta(Meta meta)
-                {
-                    Console.WriteLine("next '{0}'", meta.NextToken);
-                    if (target.NewestId > meta?.NewestId) return;
-                    target.NewestId = meta?.NewestId;
-                    var filename = path(target.UserName, ".newest.txt");
-                    File.WriteAllText(filename, target.NewestId.ToString());
-                }
-
+                Directory.CreateDirectory(target.SaveTo);
+                var option = target.Option;
+                var count = 0;
+                var retry = 0;
+                var user = twitter.GetUserAsync(target.UserName).Result;
                 do
                 {
-                    var timeline = client.GetTimelineAsync(target.UserName, option).Result;
-                    var medias = timeline.Includes?.Media?.ToDictionary(_ => _.Key) ?? new();
-                    timeline
+                    var tweets =
+                        target.IsTimeline ? twitter.GetTimelineAsync(user, (TimelineOption)option).Result :
+                        target.IsLikes ? twitter.GetLikesAsync((TimelineOption_Ver1)option).Result :
+                        null;
+                    var meta = tweets?.Meta;
+                    if (meta.IsEmpty && retry < 3)
+                    {
+                        Console.WriteLine("retry");
+                        continue;
+                    }
+                    retry = 0;
+                    tweets?
                     .Where(_ =>
                         (target.HasTweet && !_.IsReply && !_.IsRetweet) ||
                         (target.HasReply && _.IsReply) ||
                         (target.HasRetweet && _.IsRetweet))
                     .Foreach(_ =>
                     {
-                        if (target.HasText) save(_);
-                        _.Attachments?
-                            .MediaKeys?
-                            .Where(k => medias.ContainsKey(k))
-                            .Select(k => medias[k])
-                            .Select(m => m.IsVideo ? client.GetTweetAsync(_.ID).Result.Includes?.Media?.FirstOrDefault() : m)
-                            .Where(m => (m.IsPhoto && target.HasPhoto) || (m.IsVideo && target.HasVideo))
-                            .Foreach(m => download(m));
+                        if (target.HasText)
+                        {
+                            var text = _.Text.Replace("\r", " ").Replace("\n", " ");
+                            Console.WriteLine("saving... [{0}] at {1} '{2}'",
+                                _.ID,
+                                _.CreatedAt,
+                                text.Length > 20 ? (text[0..20] + "...") : text);
+                            File.WriteAllText(path(_.ID, ".txt"), _.Text);
+                        }
+                        _.Medias?
+                            .Select(m => string.IsNullOrEmpty(m.Url) ? twitter.GetTweetAsync(_.ID).Result.Includes?.Media?.FirstOrDefault() : m)
+                            .Where(m => (m.IsPhoto && target.HasPhoto) || (m.IsVideo && target.HasVideo) || (m.IsGif && target.HasGif))
+                            .Foreach(m =>
+                            {
+                                Console.WriteLine("downloading... [{0}] from '{1}'", m.ID, m.Url);
+                                var regex = new Regex(@"\?.+$");
+                                var filename = path(m.ID, Path.GetExtension(regex.Replace(m.Url, "")));
+                                client.DownloadAsync(m.Url, filename).Wait();
+                            });
                     });
-                    meta(timeline.Meta);
-                    if (timeline.Meta?.OldestId != ID.Null) 
-                        old = old < timeline.Meta.OldestId ? old : timeline.Meta.OldestId;
-                    count += timeline.Meta?.ResultCount ?? 0;
-                    option.NextToken = timeline.Meta?.NextToken;
-                    if (string.IsNullOrEmpty(option.NextToken))
+                    if (target.NewestId < meta?.NewestId)
                     {
-                        if (old == ID.Max) break;
-                        if (option.UntilId == old - 1) break;
-                        option.UntilId = old - 1;
+                        target.NewestId = meta?.NewestId;
+                        var filename = path(target.UserName, ".newest.txt");
+                        File.WriteAllText(filename, target.NewestId.ToString());
                     }
+                    count += meta?.ResultCount ?? 0;
+                    Console.WriteLine("next? {0}", meta);
+                    if (!option.Next(meta)) break;
                 }
                 while (true);
                 Console.WriteLine("saved {0} tweets.", count);

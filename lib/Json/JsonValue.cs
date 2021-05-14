@@ -16,7 +16,7 @@ namespace Lib.Jsons
         public JsonValue(Stream stream) : base(stream) { }
         public JsonValue(TextReader reader) : base(reader) { }
         public JsonValue(JsonReader reader) : base(reader) { }
-        public override string Value { get => _value; set => SetValue(value); }
+        public override string Value { get => _value == "null" ? null : _value; set => SetValue(value); }
         public void SetValue(string value)
         {
             _value = value;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Lib.Jsons;
 
 namespace Lib.Web.Twitter.Objects
 {
@@ -58,5 +59,30 @@ namespace Lib.Web.Twitter.Objects
         [LowerName] public List<HashTag> HashTags { get; set; }
         [LowerName] public List<Mention> Mentions { get; set; }
         [LowerName] public List<CashTag> CashTags { get; set; }
+
+        public static Entities OfVer1(Json json) => json == null ? null : new()
+        {
+            HashTags = json["hashtags"]?.AsArray().Select(_ => new HashTag()
+            {
+                Tag = _["tag"]?.Value,
+            })
+            .ToList(),
+            Urls = json["urls"]?.AsArray().Select(_ => new Url()
+            {
+                Start = json["indices"]?[0]?.Cast<int>(),
+                End = json["indices"]?[1]?.Cast<int>(),
+                ExpandedUrl = json["expanded_url"]?.Value,
+                DisplayUrl = json["display_url"]?.Value,
+                Value = json["url"]?.Value,
+            })
+            .ToList(),
+            Mentions = json["user_mentions"]?.AsArray().Select(_ => new Mention()
+            {
+                Start = json["indices"]?[0]?.Cast<int>(),
+                End = json["indices"]?[1]?.Cast<int>(),
+                UserName = json["screen_name"]?.Value,
+            })
+            .ToList(),
+        };
     }
 }

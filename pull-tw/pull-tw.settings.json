@@ -6,31 +6,41 @@
 		{
 			"username": "",
 			"userid": "",
+			"kind": "timeline",
 			"tweet-type": [
 				"tweet",
 				"reply",
-				"retweet",
-				"like"
+				"retweet"
 			],
 			"save-content": [
 				"text",
 				"photo",
+				"gif",
 				"video"
 			],
 			"save-to": ".\\"
 		},
 		{
+			"refresh": true,
 			"username": "Twitter",
 			"tweet-type": [
 				"tweet",
-				"like",
+				"reply",
 				"retweet"
 			],
 			"save-content": [
-				"text",
-				"photo"
+				"text"
+			]
+		},
+		{
+			"username": "Twitter",
+			"kind": "likes",
+			"tweet-type": [
+				"tweet"
 			],
-			"save-to": ".\\Twitter"
+			"save-content": [
+				"text"
+			]
 		},
 		{
 		}
