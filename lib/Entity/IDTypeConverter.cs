@@ -39,15 +39,24 @@ namespace Lib.Entity
                     if (value == null) return true;
                     var type = value.GetType();
                     type = type.GetGenericTypeDefinition() == typeof(Nullable<>) ? type.GetGenericArguments()[0] : type;
-                    return decimal.TryParse(value.ToString(), out var d);
+                    return 
+                        (value is string s && decimal.TryParse(s, out var d)) ||
+                        type == typeof(decimal) ||
+                        type == typeof(long)    ||
+                        type == typeof(int)     ||
+                        type == typeof(short)   ||
+                        type == typeof(byte)    ||
+                        type == typeof(ulong)   ||
+                        type == typeof(uint)    ||
+                        type == typeof(ushort)
+                    ;
                 },
                 ex => base.IsValid(context, value)
             )
             .Invoke();
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value) => new ID(decimal.Parse(value?.ToString()));
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType) =>
-            value == null ? ID.Null :
-            value is ID id ? Convert.ChangeType(id, destinationType) : 
+            value is ID id ? id == ID.Null ? null : Convert.ChangeType(id, destinationType) : 
             base.ConvertTo(context, culture, value, destinationType);
         
     }
