@@ -43,7 +43,7 @@ namespace pull_tw
                         (target.HasRetweet && _.IsRetweet))
                     .Foreach(_ =>
                     {
-                        string name(object obj) => string.Format(target.IsLikes ? "{1}.{0}" : "{0}", obj, _.User.UserName);
+                        string name(object obj) => string.Format(target.IsLikes ? "{1}.{0}" : "{0}", obj, _.User?.UserName);
                         if (target.HasText)
                         {
                             var text = _.Text.Replace("\r", " ").Replace("\n", " ");
