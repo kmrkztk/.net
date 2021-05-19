@@ -19,6 +19,9 @@ namespace Lib.Reflection
         public static IEnumerable<Type> GetEnumerableOfType(this Type type, Type[] types) => type.IsInterface ?
                 types.Where(_ => _.GetInterfaces().Any(t => t == type)) :
                 types.Where(_ => _.IsSubclassOf(type) && !_.IsAbstract);
-        public static IEnumerable<T> GetEnumerableInstanceOfType<T>(params object[] constructorArgs) => GetEnumerableOfType<T>().Select(_ => (T)Activator.CreateInstance(_, constructorArgs));
+        public static IEnumerable<T> GetEnumerableInstanceOfType<T>(IEnumerable<Type> types, params object[] constructorArgs) => types.Select(_ => (T)Activator.CreateInstance(_, constructorArgs));
+        public static IEnumerable<T> GetEnumerableInstanceOfType<T>(params object[] constructorArgs) => GetEnumerableInstanceOfType<T>(GetEnumerableOfType<T>(), constructorArgs);
+        public static IEnumerable<object> GetEnumerableInstanceOfType(IEnumerable<Type> types, params object[] constructorArgs) => types.Select(_ => Activator.CreateInstance(_, constructorArgs));
+        public static IEnumerable<object> GetEnumerableInstanceOfType(this Type type, params object[] constructorArgs) => GetEnumerableInstanceOfType(GetEnumerableOfType(type), constructorArgs);
     }
 }

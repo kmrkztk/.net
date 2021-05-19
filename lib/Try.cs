@@ -11,6 +11,7 @@ namespace Lib
         Action _action;
         Action<Exception> _catch;
         Action _finally;
+        public Try Catch(Action @catch) => Catch(ex => @catch.Invoke());
         public Try Catch(Action<Exception> @catch) => Of(_action, @catch, _finally);
         public Try Finally(Action @finally) => Of(_action, _catch, @finally);
         public void Invoke()
@@ -45,6 +46,7 @@ namespace Lib
         Func<T> _action;
         Func<Exception, T> _catch;
         Action _finally;
+        public Try<T> Catch(Func<T> @catch) => Catch(ex => @catch.Invoke());
         public Try<T> Catch(Func<Exception, T> @catch) => Of(_action, @catch, _finally);
         public Try<T> Finally(Action @finally) => Of(_action, _catch, @finally);
         public T Invoke()
@@ -55,6 +57,7 @@ namespace Lib
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Trace.WriteLine(ex);
                 return _catch == null ? default : _catch.Invoke(ex);
             }
             finally

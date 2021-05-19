@@ -16,6 +16,7 @@ namespace Lib.IO
         readonly decimal _value;
         public decimal Value => _value;
         public FileSize(decimal size) => _value = size;
+        public FileSize(string size) => _value = Parse(size)._value;
         public FileSize(FileInfo file) : this(file.Length) { }
         public FileSize(DirectoryInfo directory) : this(GetSize(directory)) { }
         static long GetSize(DirectoryInfo directory) 
@@ -68,6 +69,7 @@ namespace Lib.IO
             result = new(i);
             return true;
         }
+        public static implicit operator FileSize(string value) => Parse(value);
     }
     public class FileSizeConverter : TypeConverter
     {

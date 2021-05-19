@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Lib
 {
-public static    class LinqExtensions
+    public static class LinqExtensions
     {
         public static void Foreach<T>(this IEnumerable<T> enums, Action<T> action) => Foreach(enums, (_, i) => action(_));
         public static void Foreach<T>(this IEnumerable<T> enums, Action<T, int> action)

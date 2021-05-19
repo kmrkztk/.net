@@ -28,6 +28,7 @@ namespace Lib
             var c = _.Value[2..].ToBinary();
             return Encoding.BigEndianUnicode.GetString(c.Part(c[0] == 0 ? 1 : 0));
         });
+        public static string TrimEnd(this string value, string last) => value?.EndsWith(last) ?? false ? value.Remove(value.Length - last.Length) : value;
         public static string ToPascalCase(this string value)    => NameStyleCase.ToPascalCase(value);
         public static string ToCamelCase(this string value)     => NameStyleCase.ToCamelCase(value);
         public static string ToSnakeCase(this string value)     => NameStyleCase.ToSnakeCase(value);
