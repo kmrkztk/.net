@@ -43,6 +43,7 @@ namespace pull_tw
                         (target.HasRetweet && _.IsRetweet))
                     .Foreach(_ =>
                     {
+                        string name(object obj) => string.Format(target.IsLikes ? "{1}.{0}" : "{0}", obj, _.User.UserName);
                         if (target.HasText)
                         {
                             var text = _.Text.Replace("\r", " ").Replace("\n", " ");
@@ -50,7 +51,7 @@ namespace pull_tw
                                 _.ID,
                                 _.CreatedAt,
                                 text.Length > 20 ? (text[0..20] + "...") : text);
-                            File.WriteAllText(path(_.ID, ".txt"), _.Text);
+                            File.WriteAllText(path(name(_.ID), ".txt"), _.Text);
                         }
                         _.Medias?
                             .Select(m => string.IsNullOrEmpty(m.Url) ? twitter.GetTweetAsync(_.ID).Result.Includes?.Media?.FirstOrDefault() : m)
@@ -59,7 +60,7 @@ namespace pull_tw
                             {
                                 Console.WriteLine("downloading... [{0}] from '{1}'", m.ID, m.Url);
                                 var regex = new Regex(@"\?.+$");
-                                var filename = path(m.ID, Path.GetExtension(regex.Replace(m.Url, "")));
+                                var filename = path(name(m.ID), Path.GetExtension(regex.Replace(m.Url, "")));
                                 client.DownloadAsync(m.Url, filename).Wait();
                             });
                     });
