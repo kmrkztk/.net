@@ -11,5 +11,6 @@ namespace Lib.Logs.DefaultLoggers
     public class DebugLogger : Logger 
     {
         protected override void Out(string format, params object[] args) => Debug.WriteLine(string.Format(format, args)); 
+        public DebugLogger() : base() { Level = Level.Debug; }
     }
 }
