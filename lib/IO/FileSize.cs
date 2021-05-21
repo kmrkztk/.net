@@ -21,6 +21,11 @@ namespace Lib.IO
         public FileSize(DirectoryInfo directory) : this(GetSize(directory)) { }
         static long GetSize(DirectoryInfo directory) 
             => directory.GetFiles().Sum(_ => _.Length) + directory.GetDirectories().Sum(_ => GetSize(_));
+        public int CompareTo(FileSize other)
+        {
+            var d = _value - other._value;
+            return d == 0 ? 0 : d < 0 ? -1 : 1;
+        }
         public override string ToString()
         {
             if (_value == 0) return "0byte";
@@ -40,11 +45,8 @@ namespace Lib.IO
             }
             return string.Format(format[index], size);
         }
-        public int CompareTo(FileSize other)
-        {
-            var d = _value - other._value;
-            return d == 0 ? 0 : d < 0 ? -1 : 1;
-        }
+        public override bool Equals(object obj) => obj is FileSize fs && this == fs;
+        public override int GetHashCode() => decimal.ToInt32(_value);
         public static Match Match(string value) => Regex.Match(value.ToLower(), @"^(\d+(\.\d+)?)([tgmk]b?|bytes?)?$");
         public static FileSize Parse(string value)
         {
@@ -70,6 +72,13 @@ namespace Lib.IO
             return true;
         }
         public static implicit operator FileSize(string value) => Parse(value);
+        public static implicit operator FileSize(decimal value) => new(value);
+        public static bool operator ==(FileSize a, FileSize b) => a.CompareTo(b) == 0;
+        public static bool operator !=(FileSize a, FileSize b) => a.CompareTo(b) != 0;
+        public static bool operator <(FileSize a, FileSize b) => a.CompareTo(b) < 0;
+        public static bool operator >(FileSize a, FileSize b) => a.CompareTo(b) > 0;
+        public static bool operator <=(FileSize a, FileSize b) => a.CompareTo(b) <= 0;
+        public static bool operator >=(FileSize a, FileSize b) => a.CompareTo(b) >= 0;
     }
     public class FileSizeConverter : TypeConverter
     {

@@ -28,6 +28,17 @@ namespace Lib
             var c = _.Value[2..].ToBinary();
             return Encoding.BigEndianUnicode.GetString(c.Part(c[0] == 0 ? 1 : 0));
         });
+        public static string ReplaceKeywords(this string input, string key, string parameter) => ReplaceKeywords(input, new[] { key }, new[] { parameter });
+        public static string ReplaceKeywords(this string input, string[] keys, string[] parameters) => ReplaceKeywords(input, RegexOptions.IgnoreCase, keys, parameters);
+        public static string ReplaceKeywords(this string input, RegexOptions option, string[] keys, string[] parameters)
+        {
+            for (var i = 0; i < keys.Length; i++) input = Regex.Replace(input, "{" + keys[i] + "([^}]*)}", parameters[i], option);
+            return input;
+        }
+        public static string ReplaceKeywords(this string input, string key) => ReplaceKeywords(input, new[] { key });
+        public static string ReplaceKeywords(this string input, string[] keys) => ReplaceKeywords(input, RegexOptions.IgnoreCase, keys);
+        public static string ReplaceKeywords(this string input, RegexOptions option, string[] keys) => ReplaceKeywords(input, option, keys, keys.Select((_, i) => "{" + i + "$1}").ToArray());
+        public static string Format(this string input, params object[] parameters) => string.Format(input, parameters);
         public static string TrimEnd(this string value, string last) => value?.EndsWith(last) ?? false ? value.Remove(value.Length - last.Length) : value;
         public static string ToPascalCase(this string value)    => NameStyleCase.ToPascalCase(value);
         public static string ToCamelCase(this string value)     => NameStyleCase.ToCamelCase(value);

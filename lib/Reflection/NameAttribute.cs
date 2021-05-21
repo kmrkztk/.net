@@ -15,9 +15,9 @@ namespace Lib
         public NameAttribute(string value) => Name = value;
         public virtual string GetName(Type type) => Name ?? type.Name;
         public virtual string GetName(MemberInfo info) => Name ?? info.Name;
-        public static string GetMemberName(MemberInfo info) => info.GetCustomAttribute<NameAttribute>()?.GetName(info);
+        public static string GetMemberName(MemberInfo info) => info.GetCustomAttribute<NameAttribute>()?.GetName(info) ?? info.Name;
         public static IEnumerable<string> GetMemberNames(MemberInfo info) => info.GetCustomAttributes<NameAttribute>().Select(_ => _.GetName(info));
-        public static string GetTypeName(Type type) => type.GetCustomAttribute<NameAttribute>()?.GetName(type);
+        public static string GetTypeName(Type type) => type.GetCustomAttribute<NameAttribute>()?.GetName(type) ?? type.Name;
         public static IEnumerable<string> GetTypeNames(Type type) => type.GetCustomAttributes<NameAttribute>().Select(_ => _.GetName(type));
     }
 }
