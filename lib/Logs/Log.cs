@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Runtime.CompilerServices;
 using Lib.Jsons;
 using Lib.Reflection;
@@ -41,20 +40,6 @@ namespace Lib.Logs
                     .Where(_ => loggers.ContainsKey(_.key))
                     .Select(_ => _.settings.Cast(loggers[_.key]))
                     .Cast<ILogger>()
-                    .Where(_ =>
-                    {
-                        try
-                        {
-                            _.Initialize();
-                            return true;
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Trace.WriteLine("failed to create logger.");
-                            System.Diagnostics.Trace.WriteLine(ex);
-                            return false;
-                        }
-                    })
                     .ToList();
             }
             catch(Exception ex)
@@ -62,10 +47,27 @@ namespace Lib.Logs
                 System.Diagnostics.Trace.WriteLine("failed to create logger. settings:" + option.FileName);
                 System.Diagnostics.Trace.WriteLine(ex);
                 Listener = new() { new ConsoleLogger(), new DebugLogger(), };
-                Listener.Foreach(_ => _.Initialize());
             }
+            Listener.SelectMany(_ => _.CreateGenerators()).Foreach(_ => Parameters[_.keywords] = _.generator);
+            Listener = Listener
+                .Where(_ =>
+                {
+                    try
+                    {
+                        _.Initialize();
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Trace.WriteLine("failed to create logger.");
+                        System.Diagnostics.Trace.WriteLine(ex);
+                        return false;
+                    }
+                })
+                .ToList();
         }
         public static List<ILogger> Listener { get; }
+        public static LogParameters Parameters { get; } = new LogParameters();
         public static Log Of(Level level,
             [CallerMemberName] string name = "",
             [CallerFilePath] string filepath = "",
@@ -86,11 +88,14 @@ namespace Lib.Logs
         public static Log Error([CallerMemberName] string name = "", [CallerFilePath] string filepath = "", [CallerLineNumber] int linenumber = 0) => Of(Level.Error, name, filepath, linenumber);
         public static Log Fatal([CallerMemberName] string name = "", [CallerFilePath] string filepath = "", [CallerLineNumber] int linenumber = 0) => Of(Level.Fatal, name, filepath, linenumber);
 
-
-
         public Level Level { get; init; }
         public LogCaller Caller { get; init; }
-        public void Out(string format, params object[] args) { foreach (var _ in Listener) _.Out(Level, Caller, string.Format(format, args)); }
+        public void Out() => Out(null);
         public void Out(object obj) => Out("{0}", obj);
+        public void Out(string format, params object[] args)
+        {
+            var param = Parameters.Generate(this, string.Format(format, args));
+            Listener.Where(_ => _.Level <= Level).Foreach(_ => _.Out(param));
+        }
     }
 }

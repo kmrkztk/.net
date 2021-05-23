@@ -8,7 +8,9 @@ namespace Lib.Logs
 {
     public interface ILogger
     {
+        Level Level { get; }
+        (string keywords, LogParameters.Generator generator)[] CreateGenerators();
         void Initialize();
-        void Out(Level level, LogCaller caller, string message);
+        void Out(object[] parameters);
     }
 }

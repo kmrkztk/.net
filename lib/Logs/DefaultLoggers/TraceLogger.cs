@@ -10,7 +10,7 @@ namespace Lib.Logs.DefaultLoggers
     [Name("trace")]
     public class TraceLogger : Logger
     {
-        protected override void Out(string format, params object[] args) => Trace.WriteLine(string.Format(format, args));
+        protected override void Out(string message) => Trace.WriteLine(message);
         public TraceLogger() : base() { Level = Level.Trace; }
     }
 }

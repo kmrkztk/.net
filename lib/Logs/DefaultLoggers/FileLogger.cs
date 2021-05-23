@@ -13,78 +13,79 @@ namespace Lib.Logs.DefaultLoggers
     [Name("default")]
     public class FileLogger : Logger
     {
+        const string KeywordAssembly = "assembly-name";
+        const string KeywordLevel = "level";
+        const string KeywordDateTime = "datetime";
+        const string KeywordAge = "age";
+        static string GetKeyword(string keyword, string format = "") => "{" + keyword + format + "}";
         static readonly string _assembly = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
-        static readonly string[] _keywords = new[]
-        {
-            "assembly-name",
-            "level",
-            "datetime",
-            "age",
-        };
-        [LowerName] public string FilePath { get; init; } = @".\{assembly-name}.log";
+        [LowerName] public string FilePath { get; init; } = @".\" + GetKeyword(KeywordAssembly) + ".log";
         [LowerName] public FileRotation Rotation { get; init; } = new FileRotation();
         public class FileRotation
         {
-            [LowerName] public FileSize Size { get; init; } = "1024";
+            [LowerName] public FileSize Size { get; init; } = "10M";
             [LowerName] public int Count { get; init; } = 0;
-            public string Suffix => ".{age:" + new string('0', Count.ToString().Length) + "}";
+            [LowerName] public bool Daily { get; init; } = false;
+            [LowerName] public string DateTimeFormat { get; init; } = "." + GetKeyword(KeywordDateTime, ":yyyyMMdd");
+            public string Suffix => "." + GetKeyword(KeywordAge, ":" + new string('0', Count.ToString().Length));
         }
         DateTime _generating;
-        string _current;
         string _filename;
-        string _rotate;
         string _pattern;
-        bool _daily;
+        string _datetime;
+        string _age;
+        string _ex;
 
         StreamWriter _writer;
-        ~FileLogger() => _writer.Dispose();
+        ~FileLogger() => _writer?.Dispose();
         public override void Initialize()
         {
             base.Initialize();
 
-            _filename = FilePath
-                .Replace("{datetime}", "{datetime:yyyyMMdd}")
-                .ReplaceKeywords(
-                    _keywords[0..2],
-                    new[] { _assembly, Level.ToString().ToLower(), });
-            _current = GenerateFile();
-            _writer = OpenStream();
-
-            var current = new FileInfo(_current);
-            var ex = current.Extension;
-            var suffix = Rotation.Suffix;
-            _rotate = current.FullName.TrimEnd(ex) + suffix + ex;
-
-            _pattern = new FileInfo((_filename.TrimEnd(ex) + suffix + ex).ReplaceKeywords(_keywords[2..4], new[] { "*", "*", })).Name;
-            _daily = Regex.IsMatch(FilePath, "{datetime[^}]*}");
+            _filename = FilePath.ReplaceKeywords(new[] { KeywordAssembly, KeywordLevel, }).Format(_assembly, Level.ToString().ToLower());
+            _ex = Path.GetExtension(_filename);
+            _datetime = Rotation.Daily ? Rotation.DateTimeFormat : "";
+            _age = Rotation.Suffix;
+            _pattern = 
+                Path.GetFileNameWithoutExtension(_filename) + 
+                _datetime.ReplaceKeywords(KeywordDateTime, "*") + 
+                _age.ReplaceKeywords(KeywordAge, "*") +
+                _ex;
+            _datetime = _datetime.ReplaceKeywords(KeywordDateTime);
+            _age = _age.ReplaceKeywords(KeywordAge);
+            Refresh(false);
         }
-        string GenerateFile() => _filename.ReplaceKeywords(_keywords[2]).Format(_generating = Now);
-        StreamWriter OpenStream() => new(_current, true);
-        public void Rotate()
+        public void Refresh(bool rotation = true)
         {
-            void rotate(string filename, int index)
-            {
-                var dst = _rotate.ReplaceKeywords(_keywords[2..4]).Format(_generating, index);
-                if (File.Exists(dst)) rotate(dst, index + 1);
-                File.Move(filename, dst);
-            }
             _writer?.Dispose();
-            _current = GenerateFile();
-            if (File.Exists(_current)) rotate(_current, 0);
-            var current = new FileInfo(_current);
-            var files =
-                current.Directory
+            _generating = DateTime.Now;
+            var fn = Rotation.Daily ? _filename.TrimEnd(_ex) + _datetime.Format(_generating) + _ex : _filename;
+            if (rotation)
+            {
+                var rn = fn.TrimEnd(_ex) + _age + _ex;
+                void rotate(string filename, int index)
+                {
+                    var dst = rn.Format(index);
+                    if (File.Exists(dst)) rotate(dst, index + 1);
+                    File.Move(filename, dst);
+                }
+                if (File.Exists(fn)) rotate(fn, 0);
+            }
+            var fi = new FileInfo(fn);
+            var di = fi.Directory;
+            if (!di.Exists) di.Create();
+            var files = di
                 .GetFiles(_pattern)
                 .OrderBy(_ => _.LastWriteTime)
                 .ToList();
             files.Take(files.Count - Rotation.Count).Foreach(_ => _.Delete());
-            _writer = OpenStream();
+            _writer = new(fn, true);
         }
-        protected override void Out(string format, params object[] args)
+        protected override void Out(string message)
         {
-            if (_writer.BaseStream.Length >= Rotation.Size) Rotate();
-            if (_daily && _generating.Date != Now.Date) Rotate();
-            _writer.WriteLine(format, args);
+            if (_writer.BaseStream.Length >= Rotation.Size) Refresh();
+            if (Rotation.Daily && _generating.Date != DateTime.Now.Date) Refresh();
+            _writer.WriteLine(message);
             _writer.Flush();
         }
     }

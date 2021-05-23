@@ -16,20 +16,24 @@ namespace Lib.Logs.DefaultLoggers
 #else
             = Level.Info;
 #endif
-        [LowerName] public string Format { get; init; } = @"{now:yyyy/MM/dd HH:mm:ss.fff}{sep}[{level,-5}]{sep}{thread:x}{sep}{category}{sep}{message}";
+        [LowerName] public string Format { get; init; } = @"{timestamp:yyyy/MM/dd HH:mm:ss.fff}{sep}[{level,-5}]{sep}{thread:x}{sep}{method}{sep}{message}";
         [LowerName] public string Separator { get; init; } = ", ";
         string _format;
         public virtual void Initialize() => _format = Format
             .ReplaceKeywords("sep", Separator)
-            .ReplaceKeywords(new[] { "now", "level", "thread", "category", "message", });
-        public void Out(Level level, LogCaller caller, string message)
+            .ReplaceKeywords(Log.Parameters.Keys);
+        public (string, LogParameters.Generator)[] CreateGenerators() => new (string, LogParameters.Generator)[]
         {
-            if (level < Level) return;
-            Out(_format, Now, level, ThreadId, caller, message);
-        }
-        protected abstract void Out(string format, params object[] args);
-        protected virtual DateTime Now => DateTime.Now;
-        protected virtual int? ThreadId => Thread.CurrentThread.ManagedThreadId;
+            ("level"        , (log, msg) => log.Level                               ),
+            ("method"       , (log, msg) => log.Caller.MemberName                   ),
+            ("linenumber"   , (log, msg) => log.Caller.LineNumber                   ),
+            ("filepath"     , (log, msg) => log.Caller.FilePath                     ),
+            ("filename"     , (log, msg) => new FileInfo(log.Caller.FilePath).Name  ),
+            ("message"      , (log, msg) => msg                                     ),
+            ("timestamp"    , (log, msg) => DateTime.Now                            ),
+            ("thread"       , (log, msg) => Thread.CurrentThread.ManagedThreadId    ),
+        };
+        public void Out(object[] parameters) => Out(string.Format(_format, parameters));
+        protected abstract void Out(string message);
     }
-
 }

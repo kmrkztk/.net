@@ -1,11 +1,6 @@
 [
   {
-    "filepath": "{assembly-name}_{datetime}.log",
-    "rotation": {
-      "size": "10m",
-      "count": 100
-    }
+    "filepath": "{assembly-name}.log",
   },
-  { "type": "trace" },
   { "type": "console" }
 ]

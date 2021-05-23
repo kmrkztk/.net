@@ -2,16 +2,16 @@
   {
     "type": "console",
     "level": "Info",
-    "format": "{now:yyyy/MM/dd HH:mm:ss.fff},[{level,-5}],{thread:x},{category},{message}"
+    "format": "{timestamp:yyyy/MM/dd HH:mm:ss.fff},[{level,-5}],{thread:x},{method},{message}"
   },
   {
     "type": "debug",
     "level": "Debug",
-    "format": "{now:yyyy/MM/dd HH:mm:ss.fff}:{message}"
+    "format": "{timestamp:yyyy/MM/dd HH:mm:ss.fff}:{message}"
   },
   {
     "level": "Info",
-    "format": "{now:yyyy/MM/dd HH:mm:ss.fff},[{level,-5}],{thread:0000},{category},{message}",
+    "format": "{timestamp:yyyy/MM/dd HH:mm:ss.fff},[{level,-5}],{thread:0000},{method},{message}",
     "filepath": "{assembly-name}.log",
     "rotation": {
       "count": 100,
@@ -20,7 +20,7 @@
   },
   {
     "level": "Error",
-    "format": "{now:yyyy/MM/dd HH:mm:ss.fff},[{level,-5}],{thread:0000},{category},{message}",
+    "format": "{timestamp:yyyy/MM/dd HH:mm:ss.fff},[{level,-5}],{thread:0000},{method},{message}",
     "filepath": "{assembly-name}-{level}_{datetime}.log",
     "rotation": {
       "count": 10,

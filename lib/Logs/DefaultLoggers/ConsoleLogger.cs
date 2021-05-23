@@ -9,6 +9,6 @@ namespace Lib.Logs.DefaultLoggers
     [Name("console")]
     public class ConsoleLogger : Logger
     {
-        protected override void Out(string format, params object[] args) => Console.WriteLine(format, args);
+        protected override void Out(string message) => Console.WriteLine(message);
     }
 }
