@@ -1,6 +1,6 @@
 [
   {
-    "filepath": "{assembly-name}.log",
+    "filepath": "{assembly-name}.log"
   },
   { "type": "console" }
 ]
