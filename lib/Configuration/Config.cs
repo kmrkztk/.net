@@ -9,6 +9,7 @@ using Lib.Reflection;
 
 namespace Lib.Configuration
 {
+    public delegate void ConfigWachedEventHandler(object sender, FileSystemEventArgs e);
     public sealed class Config
     {
         readonly object _instance;
@@ -17,17 +18,27 @@ namespace Lib.Configuration
         readonly string _filename;
         readonly ConfigLoader _loader;
         readonly FileSystemWatcher _watcher;
-        Config(Type type, string filename, ConfigLoader loader, bool autoRefresh)
+        readonly ConfigWachedEventHandler _changed;
+        Config(Type type, string filename, ConfigLoader loader, bool watch, ConfigWachedEventHandler changed)
         {
             _type = type;
             _filename = filename;
             _loader = loader;
             _instance = _loader.Load(_filename, _type);
             _props = Property.GetProperties(_instance).ToList();
-            if (autoRefresh)
+            _changed = changed;
+            if (watch || changed != null)
             {
-                _watcher = new FileSystemWatcher(filename);
-                _watcher.Changed += (sender, e) => Refresh();
+                var fi = new FileInfo(_filename);
+                _watcher = new FileSystemWatcher()
+                {
+                    Path = fi.Directory.FullName,
+                    Filter = fi.Name,
+                    IncludeSubdirectories = false,
+                    EnableRaisingEvents = true,
+                };
+                if (watch) _watcher.Changed += (sender, e) => Refresh();
+                if (changed != null) _watcher.Changed += (sender, e) => _changed?.Invoke(sender, e);
             }
         }
         public void Refresh()
@@ -38,11 +49,15 @@ namespace Lib.Configuration
         }
 
         readonly static List<Config> _configs = new();
-        public static T Load<T>() => Load<T>((ConfigAttribute)typeof(T).GetCustomAttributes(typeof(ConfigAttribute), false).FirstOrDefault() ?? throw new ArgumentNullException(nameof(T)));
-        public static T Load<T>(ConfigAttribute attribute) => Load<T>(attribute.FileName, ConfigLoader.GetLoader(attribute.Type), attribute.AutoRefresh);
-        public static T Load<T>(string filename, ConfigLoader loader, bool autoRefresh)
+        static ConfigAttribute GetAttrubute<T>() => (ConfigAttribute)typeof(T).GetCustomAttributes(typeof(ConfigAttribute), false).FirstOrDefault();
+        public static T Load<T>() => Load<T>(GetAttrubute<T>());
+        public static T Load<T>(ConfigWachedEventHandler changed) => Load<T>(GetAttrubute<T>(), changed);
+        public static T Load<T>(ConfigAttribute attribute) => Load<T>(attribute, null);
+        public static T Load<T>(ConfigAttribute attribute, ConfigWachedEventHandler changed) => Load<T>(attribute.FileName, ConfigLoader.GetLoader(attribute.Type), attribute.Watching, changed);
+        public static T Load<T>(string filename, ConfigLoader loader, bool watch) => Load<T>(filename, loader, watch, null);
+        public static T Load<T>(string filename, ConfigLoader loader, bool watch, ConfigWachedEventHandler changed)
         {
-            var config = new Config(typeof(T), filename, loader, autoRefresh);
+            var config = new Config(typeof(T), filename, loader, watch, changed);
             _configs.Add(config);
             return (T)config._instance;
         }

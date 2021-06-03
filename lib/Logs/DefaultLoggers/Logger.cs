@@ -19,7 +19,8 @@ namespace Lib.Logs.DefaultLoggers
         [LowerName] public string Format { get; init; } = @"{timestamp:yyyy/MM/dd HH:mm:ss.fff}{sep}[{level,-5}]{sep}{thread:x}{sep}{method}{sep}{message}";
         [LowerName] public string Separator { get; init; } = ", ";
         string _format;
-        public virtual void Initialize() => _format = Format
+        public virtual void Dispose() => GC.SuppressFinalize(this);
+        public virtual void Refresh() => _format = Format
             .ReplaceKeywords("sep", Separator)
             .ReplaceKeywords(Log.Parameters.Keys);
         public (string, LogParameters.Generator)[] CreateGenerators() => new (string, LogParameters.Generator)[]
@@ -33,7 +34,17 @@ namespace Lib.Logs.DefaultLoggers
             ("timestamp"    , (log, msg) => DateTime.Now                            ),
             ("thread"       , (log, msg) => Thread.CurrentThread.ManagedThreadId    ),
         };
-        public void Out(object[] parameters) => Out(string.Format(_format, parameters));
+        public void Out(object[] parameters)
+        {
+            try
+            {
+                Out(string.Format(_format, parameters));
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.WriteLine(ex);
+            }
+        }
         protected abstract void Out(string message);
     }
 }

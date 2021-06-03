@@ -14,7 +14,7 @@ namespace Lib.Configuration
     {
         public string FileName { get; }
         public ConfigType Type { get; init; } = ConfigType.Json;
-        public bool AutoRefresh { get; init; }
+        public bool Watching { get; init; }
         public ConfigAttribute(string filename) => FileName = filename;
     }
     public enum ConfigType

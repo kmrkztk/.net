@@ -14,7 +14,7 @@ namespace Lib.Configuration
     {
         public object Load(string filename, Type type)
         {
-            using var fs = new FileStream(filename, FileMode.Open);
+            using var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             return Load(fs, type);
         }
         public abstract object Load(Stream stream, Type type);

@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Lib.Logs
 {
-    public interface ILogger
+    public interface ILogger : IDisposable
     {
         Level Level { get; }
         (string keywords, LogParameters.Generator generator)[] CreateGenerators();
-        void Initialize();
+        void Refresh();
         void Out(object[] parameters);
     }
 }

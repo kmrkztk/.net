@@ -37,10 +37,15 @@ namespace Lib.Logs.DefaultLoggers
         string _ex;
 
         StreamWriter _writer;
-        ~FileLogger() => _writer?.Dispose();
-        public override void Initialize()
+        ~FileLogger() => Dispose();
+        public override void Dispose()
         {
-            base.Initialize();
+            _writer?.Dispose();
+            GC.SuppressFinalize(this);
+        }
+        public override void Refresh()
+        {
+            base.Refresh();
 
             _filename = FilePath.ReplaceKeywords(new[] { KeywordAssembly, KeywordLevel, }).Format(_assembly, Level.ToString().ToLower());
             _ex = Path.GetExtension(_filename);
@@ -55,7 +60,7 @@ namespace Lib.Logs.DefaultLoggers
             _age = _age.ReplaceKeywords(KeywordAge);
             Refresh(false);
         }
-        public void Refresh(bool rotation = true)
+        protected void Refresh(bool rotation)
         {
             _writer?.Dispose();
             _generating = DateTime.Now;
@@ -83,8 +88,8 @@ namespace Lib.Logs.DefaultLoggers
         }
         protected override void Out(string message)
         {
-            if (_writer.BaseStream.Length >= Rotation.Size) Refresh();
-            if (Rotation.Daily && _generating.Date != DateTime.Now.Date) Refresh();
+            if (_writer.BaseStream.Length >= Rotation.Size) Refresh(true);
+            if (Rotation.Daily && _generating.Date != DateTime.Now.Date) Refresh(true);
             _writer.WriteLine(message);
             _writer.Flush();
         }

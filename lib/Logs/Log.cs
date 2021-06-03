@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Runtime.CompilerServices;
+using Lib.Configuration;
 using Lib.Jsons;
 using Lib.Reflection;
 using Lib.Logs.DefaultLoggers;
@@ -13,61 +14,29 @@ namespace Lib.Logs
 {
     public class Log
     {
-        class Option
+        class CommandOption
         {
             [Command("log.options.filename")] [CommandValue] public string FileName { get; set; } = @".\log.settings.json";
-            public static Option Load() => Arguments<Option>.Load().Options;
+            public static CommandOption Load() => Arguments<CommandOption>.Load().Options;
+        }
+        class LogListenerLoader : ConfigLoader
+        {
+            public override object Load(Stream stream, Type type)
+            {
+                Listener.Reload(stream);
+                Parameters.Clear();
+                Listener.SelectMany(_ => _.CreateGenerators()).Foreach(_ => Parameters[_.keywords] = _.generator);
+                Listener.Refresh();
+                return new();
+            }
         }
         static Log()
         {
-            var loggers = typeof(ILogger)
-                .GetEnumerableOfType()
-                .Where(_ => !_.IsAbstract)
-                .Where(_ => !_.IsInterface)
-                .SelectMany(type => NameAttribute.GetTypeNames(type)
-                .Concat(new[] { type.Name, })
-                .Select(n => n.ToLower())
-                .Distinct()
-                .Select(name => (name, type)))
-                .ToDictionary(_ => _.name, _ => _.type);
-            var option = Option.Load();
-            try
-            {
-                var settings = Json.Load(new FileStream(option.FileName, FileMode.Open));
-                Listener = settings
-                    .AsArray()
-                    .Select(_ => (settings:_, key:_["type"]?.Value?.ToLower() ?? "default"))
-                    .Where(_ => loggers.ContainsKey(_.key))
-                    .Select(_ => _.settings.Cast(loggers[_.key]))
-                    .Cast<ILogger>()
-                    .ToList();
-            }
-            catch(Exception ex)
-            {
-                System.Diagnostics.Trace.WriteLine("failed to create logger. settings:" + option.FileName);
-                System.Diagnostics.Trace.WriteLine(ex);
-                Listener = new() { new ConsoleLogger(), new DebugLogger(), };
-            }
-            Listener.SelectMany(_ => _.CreateGenerators()).Foreach(_ => Parameters[_.keywords] = _.generator);
-            Listener = Listener
-                .Where(_ =>
-                {
-                    try
-                    {
-                        _.Initialize();
-                        return true;
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Trace.WriteLine("failed to create logger.");
-                        System.Diagnostics.Trace.WriteLine(ex);
-                        return false;
-                    }
-                })
-                .ToList();
+            var option = CommandOption.Load();
+            Config.Load<object>(option.FileName, new LogListenerLoader(), true);
         }
-        public static List<ILogger> Listener { get; }
-        public static LogParameters Parameters { get; } = new LogParameters();
+        public static LogListener Listener { get; } = new();
+        public static LogParameters Parameters { get; } = new();
         public static Log Of(Level level,
             [CallerMemberName] string name = "",
             [CallerFilePath] string filepath = "",
