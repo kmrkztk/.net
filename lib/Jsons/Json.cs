@@ -8,10 +8,6 @@ using System.Collections;
 
 namespace Lib.Jsons
 {
-    public enum JsonValueType
-    {
-        None, String, Numeric, Boolean, Null
-    }
     public abstract partial class Json
     {
         public const char ObjectChar = '{';
@@ -53,11 +49,11 @@ namespace Lib.Jsons
         }
         public Json Parent { get; protected set; }
         public void SetParent(Json json) => Parent = json;
-        public static T Load<T>(string value) => Load<T>(new StringReader(value));
+        public static T Load<T>(string filename) => Load<T>(new FileStream(filename, FileMode.Open));
         public static T Load<T>(Stream stream) => Load<T>(new StreamReader(stream));
         public static T Load<T>(TextReader reader) => Load<T>(new JsonReader(reader));
         public static T Load<T>(JsonReader reader) => Load(reader).Cast<T>();
-        public static Json Load(string value) => Load(new StringReader(value));
+        public static Json Load(string filename) => Load(new FileStream(filename, FileMode.Open));
         public static Json Load(Stream stream) => Load(new StreamReader(stream));
         public static Json Load(TextReader reader) => Load(new JsonReader(reader));
         public static Json Load(JsonReader reader) => (char)reader.Peek() switch

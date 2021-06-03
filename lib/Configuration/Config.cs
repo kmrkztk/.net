@@ -9,44 +9,42 @@ using Lib.Reflection;
 
 namespace Lib.Configuration
 {
-    /*
-    public static class Config
+    public sealed class Config
     {
-        static FileSystemWatcher _watch;
-        public static T Load<T>()
+        readonly object _instance;
+        readonly Type _type;
+        readonly List<Property> _props;
+        readonly string _filename;
+        readonly ConfigLoader _loader;
+        readonly FileSystemWatcher _watcher;
+        Config(Type type, string filename, ConfigLoader loader, bool autoRefresh)
         {
-            var settings = ConfigurationManager.AppSettings;
-            var instance = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
-            var map = PropertyMap.Of(instance);
-            foreach (var k in settings.AllKeys) 
-                try { map.SetValue(k, settings[k]); } catch { }
-            return instance;
-        }
-        public static void Watch(object instance)
-        {
-            var map = PropertyMap.Of(instance);
-            var fi = new FileInfo(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).FilePath);
-            if (_watch != null) Release();
-            _watch = new FileSystemWatcher(fi.DirectoryName, fi.Name);
-            _watch.Changed += (sender, e) =>
+            _type = type;
+            _filename = filename;
+            _loader = loader;
+            _instance = _loader.Load(_filename, _type);
+            _props = Property.GetProperties(_instance).ToList();
+            if (autoRefresh)
             {
-                try
-                {
-                    ConfigurationManager.RefreshSection("appSettings");
-                    var settings = ConfigurationManager.AppSettings;
-                    foreach (var k in settings.AllKeys)
-                        try { map.SetValue(k, settings[k]); } catch { }
-                }
-                catch { }
-            };
-            _watch.EnableRaisingEvents = true;
+                _watcher = new FileSystemWatcher(filename);
+                _watcher.Changed += (sender, e) => Refresh();
+            }
         }
-        public static void Release() 
+        public void Refresh()
         {
-            _watch.EnableRaisingEvents = false;
-            _watch?.Dispose();
-            _watch = null;
+            if (!File.Exists(_filename)) return;
+            var instance = _loader.Load(_filename, _type);
+            _props.Foreach(_ => _.SetValue(_.Info.GetValue(instance)));
+        }
+
+        readonly static List<Config> _configs = new();
+        public static T Load<T>() => Load<T>((ConfigAttribute)typeof(T).GetCustomAttributes(typeof(ConfigAttribute), false).FirstOrDefault() ?? throw new ArgumentNullException(nameof(T)));
+        public static T Load<T>(ConfigAttribute attribute) => Load<T>(attribute.FileName, ConfigLoader.GetLoader(attribute.Type), attribute.AutoRefresh);
+        public static T Load<T>(string filename, ConfigLoader loader, bool autoRefresh)
+        {
+            var config = new Config(typeof(T), filename, loader, autoRefresh);
+            _configs.Add(config);
+            return (T)config._instance;
         }
     }
-    */
 }
