@@ -49,7 +49,7 @@ namespace Lib.Web.Twitter
         public Json GetJson(string url, CancellationToken cancel)
         {
             Console.WriteLine(url);
-            var json = _client.GetJson(url, cancel);
+            var json = _client.GetAsync(url, cancel).Result.Content.ToJson();
             if (json is JsonObject && json["errors"] != null) throw new TwitterApiException(json);
             return json;
         }

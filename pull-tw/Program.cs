@@ -64,7 +64,7 @@ namespace pull_tw
                                 Log.Info().Out("downloading... [{0}]({1}) from '{1}'", _.ID, m.ID, m.Url);
                                 var regex = new Regex(@"\?.+$");
                                 var filename = path(name(m.ID), Path.GetExtension(regex.Replace(m.Url, "")));
-                                client.DownloadAsync(m.Url, filename).Wait();
+                                client.GetAsync(m.Url).Result.Content.DownloadAsync(filename).Wait();
                             });
                     });
                     if (target.NewestId < meta?.NewestId)

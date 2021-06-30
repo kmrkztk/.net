@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 using Lib.Reflection;
 
 namespace Lib.Configuration
@@ -37,7 +38,11 @@ namespace Lib.Configuration
                     IncludeSubdirectories = false,
                     EnableRaisingEvents = true,
                 };
-                if (watch) _watcher.Changed += (sender, e) => Refresh();
+                if (watch) _watcher.Changed += (sender, e) =>
+                {
+                    if (e.ChangeType != WatcherChangeTypes.Changed) return;
+                    Refresh();
+                };
                 if (changed != null) _watcher.Changed += (sender, e) => _changed?.Invoke(sender, e);
             }
         }
@@ -49,9 +54,8 @@ namespace Lib.Configuration
         }
 
         readonly static List<Config> _configs = new();
-        static ConfigAttribute GetAttrubute<T>() => (ConfigAttribute)typeof(T).GetCustomAttributes(typeof(ConfigAttribute), false).FirstOrDefault();
-        public static T Load<T>() => Load<T>(GetAttrubute<T>());
-        public static T Load<T>(ConfigWachedEventHandler changed) => Load<T>(GetAttrubute<T>(), changed);
+        public static T Load<T>() => Load<T>(typeof(T).GetCustomAttribute<ConfigAttribute>());
+        public static T Load<T>(ConfigWachedEventHandler changed) => Load<T>(typeof(T).GetCustomAttribute<ConfigAttribute>(), changed);
         public static T Load<T>(ConfigAttribute attribute) => Load<T>(attribute, null);
         public static T Load<T>(ConfigAttribute attribute, ConfigWachedEventHandler changed) => Load<T>(attribute.FileName, ConfigLoader.GetLoader(attribute.Type), attribute.Watching, changed);
         public static T Load<T>(string filename, ConfigLoader loader, bool watch) => Load<T>(filename, loader, watch, null);
