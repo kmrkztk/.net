@@ -23,7 +23,7 @@ namespace pull_tw
             var twitter = new TwitterClient(client, settings.Bearer);
             settings.Targets
                 .Where(_ => !string.IsNullOrEmpty(_.UserName))
-                .Foreach(target =>
+                .Do(target =>
             {
                 Log.Info().Out("pull '{0}'...", target.UserName);
                 string path(object name, string ext) => string.Format(@"{0}\{1}{2}", target.SaveTo, name, ext);
@@ -44,7 +44,7 @@ namespace pull_tw
                         (target.HasTweet && !_.IsReply && !_.IsRetweet) ||
                         (target.HasReply && _.IsReply) ||
                         (target.HasRetweet && _.IsRetweet))
-                    .Foreach(_ =>
+                    .Do(_ =>
                     {
                         string name(object obj) => string.Format(target.IsLikes ? "{1}.{0}" : "{0}", obj, _.User?.UserName);
                         if (target.HasText)
@@ -59,7 +59,7 @@ namespace pull_tw
                         _.Medias?
                             .Select(m => string.IsNullOrEmpty(m.Url) ? twitter.GetTweetAsync(_.ID).Result.Includes?.Media?.FirstOrDefault() : m)
                             .Where(m => (m.IsPhoto && target.HasPhoto) || (m.IsVideo && target.HasVideo) || (m.IsGif && target.HasGif))
-                            .Foreach(m =>
+                            .Do(m =>
                             {
                                 Log.Info().Out("downloading... [{0}]({1}) from '{1}'", _.ID, m.ID, m.Url);
                                 var regex = new Regex(@"\?.+$");

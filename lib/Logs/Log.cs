@@ -25,17 +25,17 @@ namespace Lib.Logs
             {
                 Listener.Reload(stream);
                 Parameters.Clear();
-                Listener.SelectMany(_ => _.CreateGenerators()).Foreach(_ => Parameters[_.keywords] = _.generator);
-                Listener.Refresh();
                 return new();
             }
         }
         static Log()
         {
             var option = CommandOption.Load();
-            Config.Load<object>(option.FileName, new LogListenerLoader(), true);
+            Try.Of(() => Config.Load<object>(option.FileName, new LogListenerLoader(), true)).Invoke();
+            Listener.SelectMany(_ => _.CreateGenerators()).Do(_ => Parameters[_.keywords] = _.generator);
+            Listener.Refresh();
         }
-        public static LogListener Listener { get; } = new();
+        public static LogListener Listener { get; } = new() { new TraceLogger(), };
         public static LogParameters Parameters { get; } = new();
         public static Log Of(Level level,
             [CallerMemberName] string name = "",
@@ -64,7 +64,7 @@ namespace Lib.Logs
         public void Out(string format, params object[] args)
         {
             var param = Parameters.Generate(this, string.Format(format, args));
-            Listener.Where(_ => _.Level <= Level).Foreach(_ => _.Out(param));
+            Listener.Where(_ => _.Level <= Level).Do(_ => _.Out(param));
         }
     }
 }

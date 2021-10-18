@@ -45,9 +45,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lib.Web.Twitter", "lib.Web.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lib.Web", "lib.Web\lib.Web.csproj", "{4C5C91BE-2EA3-4C35-AE69-AF97C913989E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zip", "zip\zip.csproj", "{99EEBE07-A4F4-4407-890C-DBA70BAA49AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zip", "zip\zip.csproj", "{99EEBE07-A4F4-4407-890C-DBA70BAA49AF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "unzip", "unzip\unzip.csproj", "{9062DB26-D180-463C-8C46-94D656C51FE6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "evvw", "evvw\evvw.csproj", "{99D6637A-5112-4118-9C0C-54FD6ABADC06}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lib.Eventing", "lib.Eventing\lib.Eventing.csproj", "{D3A943C3-4AC1-4AED-AADB-A5C24B2CB2BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -147,6 +151,14 @@ Global
 		{9062DB26-D180-463C-8C46-94D656C51FE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9062DB26-D180-463C-8C46-94D656C51FE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9062DB26-D180-463C-8C46-94D656C51FE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99D6637A-5112-4118-9C0C-54FD6ABADC06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99D6637A-5112-4118-9C0C-54FD6ABADC06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99D6637A-5112-4118-9C0C-54FD6ABADC06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99D6637A-5112-4118-9C0C-54FD6ABADC06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3A943C3-4AC1-4AED-AADB-A5C24B2CB2BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3A943C3-4AC1-4AED-AADB-A5C24B2CB2BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3A943C3-4AC1-4AED-AADB-A5C24B2CB2BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3A943C3-4AC1-4AED-AADB-A5C24B2CB2BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

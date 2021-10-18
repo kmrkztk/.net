@@ -52,7 +52,7 @@ namespace Lib.Configuration
             var instance = type.GetConstructor(Array.Empty<Type>()).Invoke(Array.Empty<object>());
             var map = PropertyMap.Of(instance);
             map .Where(_ => _table.ContainsKey(_.Key))
-                .Foreach(_ => Try.Of(() => _.Value.SetValue(this[_.Key])));
+                .Do(_ => Try.Of(() => _.Value.SetValue(this[_.Key])));
             return instance;
         }
         public override string ToString() => string.Join("\r\n", _table.Select(_ => string.Format("{0}{1}{2}", _.Key, _separator, _.Value)));

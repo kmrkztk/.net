@@ -83,7 +83,7 @@ namespace Lib.Logs.DefaultLoggers
                 .GetFiles(_pattern)
                 .OrderBy(_ => _.LastWriteTime)
                 .ToList();
-            files.Take(files.Count - Rotation.Count).Foreach(_ => _.Delete());
+            files.Take(files.Count - Rotation.Count).Do(_ => _.Delete());
             _writer = new(fn, true);
         }
         protected override void Out(string message)

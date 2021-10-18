@@ -50,7 +50,7 @@ namespace Lib.Configuration
         {
             if (!File.Exists(_filename)) return;
             var instance = _loader.Load(_filename, _type);
-            _props.Foreach(_ => _.SetValue(_.Info.GetValue(instance)));
+            _props.Do(_ => _.SetValue(_.Info.GetValue(instance)));
         }
 
         readonly static List<Config> _configs = new();

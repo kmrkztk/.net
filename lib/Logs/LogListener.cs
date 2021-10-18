@@ -24,10 +24,10 @@ namespace Lib.Logs
                 .Distinct()
                 .Select(name => (name, type)))
                 .ToDictionary(_ => _.name, _ => _.type);
-        List<ILogger> _listener = new();
+        List<ILogger> _listener;
         public void Reload(Stream stream)
         {
-            _listener.Foreach(_ =>
+            _listener.Do(_ =>
             {
                 _.Dispose();
                 this.Remove(_);
@@ -40,9 +40,9 @@ namespace Lib.Logs
                     .Select(_ => _.settings.Cast(_loggers[_.key]))
                     .Cast<ILogger>()
                     .ToList())
-                .Catch(() => new() { new ConsoleLogger(), new DebugLogger(), })
+                .Catch(() => new() { new ConsoleLogger(), new TraceLogger(), })
                 .Invoke();
-            _listener.Foreach(_ => this.Add(_));
+            _listener.Do(_ => this.Add(_));
         }
         public void Refresh() => this
             .Where(_ => 
@@ -54,6 +54,6 @@ namespace Lib.Logs
                 .Catch(() => true)
                 .Invoke())
             .ToList()
-            .Foreach(_ => Remove(_));
+            .Do(_ => Remove(_));
     }
 }

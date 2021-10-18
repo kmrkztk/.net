@@ -14,7 +14,7 @@ namespace zip
         static void Main()
         {
             var a = Arguments<Options>.Load();
-            if (a.Count() == 0)
+            if (a.Count == 0)
             {
                 a.PrintHelp();
                 return;
@@ -32,7 +32,7 @@ namespace zip
         static void View(string filepath)
         {
             var a = ZipFile.OpenRead(filepath);
-            a.Entries.Foreach(_ => Console.WriteLine(_.FullName));
+            a.Entries.Do(_ => Console.WriteLine(_.FullName));
         }
 
         [Detail("unzip (archive) [destination]")]

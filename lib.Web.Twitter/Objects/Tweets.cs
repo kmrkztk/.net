@@ -32,7 +32,7 @@ namespace Lib.Web.Twitter.Objects
                 Meta = json["meta"]?.Cast<Meta>(),
             };
             var medias = tweets.Includes?.Media?.ToDictionary(_ => _.Key);
-            tweets.Foreach(_ => _.Medias = _
+            tweets.Do(_ => _.Medias = _
                 .Attachments?
                 .MediaKeys?
                 .Where(_ => medias.ContainsKey(_))

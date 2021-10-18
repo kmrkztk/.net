@@ -23,7 +23,7 @@ namespace Lib.Logs
             set { if (_dictionary.ContainsKey(key)) _dictionary[key] = value; else _dictionary.Add(key, value); }
         }
         public void Clear() => _dictionary.Clear();
-        public void AddRange(IEnumerable<(string keyword, Generator generator)> generators) => generators.Foreach(_ => this[_.keyword] = _.generator);
+        public void AddRange(IEnumerable<(string keyword, Generator generator)> generators) => generators.Do(_ => this[_.keyword] = _.generator);
         public string[] Keys => _dictionary.Keys.ToArray();
         public object[] Generate(Log log, string message) => _dictionary.Values.Select(_ => _.Invoke(log, message)).ToArray();
     }

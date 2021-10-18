@@ -14,7 +14,7 @@ namespace zip
         static void Main()
         {
             var a = Arguments<Options>.Load();
-            if (a.Count() == 0)
+            if (a.Count == 0)
             {
                 a.PrintHelp();
                 return;
@@ -34,7 +34,7 @@ namespace zip
                     var root = di.Parent.FullName + "\\";
                     di
                         .GetFiles("*.*", SearchOption.AllDirectories)
-                        .Foreach(_ => Add(archive, _.FullName, _.FullName.Replace(root, "")));
+                        .Do(_ => Add(archive, _.FullName, _.FullName.Replace(root, "")));
                 }
                 else if (File.Exists(e)) Add(archive, e, new FileInfo(e).Name);
             }
@@ -42,7 +42,7 @@ namespace zip
         static void View(string filepath)
         {
             var a = ZipFile.OpenRead(filepath);
-            a.Entries.Foreach(_ => Console.WriteLine(_.FullName));
+            a.Entries.Do(_ => Console.WriteLine(_.FullName));
         }
         static void Add(ZipArchive a, string filepath, string entry) 
         {
