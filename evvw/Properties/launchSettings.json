@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "evvw": {
+      "commandName": "Project",
+      "commandLineArgs": "/h 3 /error /info /warn /log IfLog,Application,System"
+    }
+  }
+}

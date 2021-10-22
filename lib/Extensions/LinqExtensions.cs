@@ -14,6 +14,13 @@ namespace Lib
         public static void Do<T>(this IEnumerable<T> enums, Action<T> action) => enums.Each(action).Do();
         public static void Do<T>(this IEnumerable<T> enums, Action<T, int> action) => enums.Each(action).Do();
         public static void Do<T>(this IEnumerable<T> enums) { foreach (var _ in enums) { } }
+        public static TResult Do<T, TResult>(this IEnumerable<T> enums, Func<T, TResult, TResult> selector) => Do(enums, default(TResult), selector);
+        public static TResult Do<T, TResult>(this IEnumerable<T> enums, TResult initial, Func<T, TResult, TResult> selector)
+        {
+            var result = initial;
+            foreach(var _ in enums) result = selector(_, result);
+            return result;
+        }
         public static IEnumerable<T> Each<T>(this IEnumerable<T> enums, Action<T> action) => enums.Each((_, i) => action(_));
         public static IEnumerable<T> Each<T>(this IEnumerable<T> enums, Action<T, int> action) => enums.Select((_, i) =>
         {
@@ -25,7 +32,37 @@ namespace Lib
         {
             foreach (var _ in array) yield return _;
         }
+
+        public static IEnumerable<T> Tail<T>(this IEnumerable<T> enums, int count)
+        {
+            var cnt = enums.Count();
+            return enums.Skip(cnt - count);
+        }
         public static IEnumerable<T> Distinct<T>(this IEnumerable<T> enums, Comparison<T> comparison) => enums.Distinct(new ComparisonComparer<T>(comparison));
+        public static IEnumerable<T> SoftOrder<T>(this IEnumerable<IEnumerable<T>> enums, Comparison<T> comparison) => enums.Skip(1).Do(enums.FirstOrDefault(), (_0, _1) => _1.SoftOrder(_0, comparison));
+        public static IEnumerable<T> SoftOrder<T>(this IEnumerable<T> enums1, IEnumerable<T> enums2, Comparison<T> comparison)
+        {
+            using var e1 = enums1.GetEnumerator();
+            using var e2 = enums2.GetEnumerator();
+            var b1 = e1.MoveNext();
+            var b2 = e2.MoveNext();
+            while (b1 && b2)
+            {
+                var c = comparison(e1.Current, e2.Current);
+                if (c <= 0)
+                {
+                    yield return e1.Current;
+                    b1 = e1.MoveNext();
+                }
+                if (c >= 0)
+                {
+                    yield return e2.Current;
+                    b2 = e2.MoveNext();
+                }
+            }
+            while (e1.MoveNext()) yield return e1.Current;
+            while (e2.MoveNext()) yield return e2.Current;
+        }
         class ComparisonComparer<T> : IEqualityComparer<T>
         {
             readonly Comparison<T> _comparison;

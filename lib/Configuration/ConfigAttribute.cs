@@ -13,7 +13,7 @@ namespace Lib.Configuration
     public class ConfigAttribute : Attribute
     {
         public string FileName { get; }
-        public ConfigType Type { get; init; } = ConfigType.Json;
+        public ConfigType Type { get; init; } = ConfigType.Original;
         public bool Watching { get; init; } = false;
         public ConfigAttribute(string filename) => FileName = filename;
     }
@@ -23,7 +23,7 @@ namespace Lib.Configuration
         AttributeTargets.Struct)]
     public class JsonConfigAttribute : ConfigAttribute
     {
-        public JsonConfigAttribute(string filename) : base(filename) { }
+        public JsonConfigAttribute(string filename) : base(filename) => Type = ConfigType.Json;
     }
     [AttributeUsage(
         AttributeTargets.Class |
@@ -31,7 +31,7 @@ namespace Lib.Configuration
         AttributeTargets.Struct)]
     public class XmlConfigAttribute : ConfigAttribute
     {
-        public XmlConfigAttribute(string filename) : base(filename) { }
+        public XmlConfigAttribute(string filename) : base(filename) => Type = ConfigType.Xml;
     }
     [AttributeUsage(
         AttributeTargets.Class |
@@ -39,7 +39,7 @@ namespace Lib.Configuration
         AttributeTargets.Struct)]
     public class IniConfigAttribute : ConfigAttribute
     {
-        public IniConfigAttribute(string filename) : base(filename) { }
+        public IniConfigAttribute(string filename) : base(filename) => Type = ConfigType.Ini;
     }
     public enum ConfigType
     {

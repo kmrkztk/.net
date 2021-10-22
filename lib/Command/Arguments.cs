@@ -50,7 +50,13 @@ namespace Lib
             {
                 var value = _args[i];
                 var key = value.ToLower();
-                if (_map.ContainsKey(key)) foreach (var p in _map[key]) p.AddValue(p.Info.HasAttribute<CommandValueAttribute>() ? _args[++i] : "true");
+                if (_map.ContainsKey(key)) foreach (var p in _map[key])
+                {
+                    var attr = p.Info.GetCustomAttribute<CommandValueAttribute>();
+                    if (attr == null) p.SetValue("true");
+                    else if (attr.Separator == char.MinValue) p.AddValue(_args[++i]);
+                    else foreach (var a in _args[++i].Split(attr.Separator)) p.AddValue(a);
+                }
                 else _values.Add(value);
             }
         }

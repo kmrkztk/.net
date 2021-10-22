@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Lib
 {
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class CommandValueAttribute : Attribute
     {
+        public char Separator { get; set; } = char.MinValue;
     }
 }

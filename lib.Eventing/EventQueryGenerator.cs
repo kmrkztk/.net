@@ -15,11 +15,11 @@ namespace Lib.Eventing
     [SupportedOSPlatform("windows")]
     public abstract class EventQueryGenerator
     {
-        public string Query => GenerateQuery().ToString();
+        public string QueryString => GenerateQuery().ToString();
         public abstract EventQuery GenerateQuery();
-        public string ToXml(params string[] path)
+        public string GenerateXPath(string path0)
         {
-            var q = Query;
+            var q = QueryString;
             var sb = new StringBuilder();
             var setting = new XmlWriterSettings()
             {
@@ -33,22 +33,26 @@ namespace Lib.Eventing
             xw.WriteStartElement("QueryList");
             xw.WriteStartElement("Query");
             xw.WriteAttributeString("Id", "0");
-            xw.WriteAttributeString("Path", path.FirstOrDefault());
-            foreach (var p in path)
-            {
-                xw.WriteStartElement("Select");
-                xw.WriteAttributeString("Path", p);
-                xw.WriteString(q);
-                xw.WriteEndElement();
-            }
+            xw.WriteAttributeString("Path", path0);
+            xw.WriteStartElement("Select");
+            xw.WriteAttributeString("Path", path0);
+            xw.WriteString(q);
+            xw.WriteEndElement();
             xw.WriteEndElement();
             xw.WriteEndElement();
             xw.Flush();
             return sb.ToString();
         }
-
+        public EventLogQuery Generate(string path0) => new(path0, PathType.LogName, QueryString);
         public static SystemQueryGenerator System => new();
+        public static AnyQueryGenerator Any(EventQuery query) => new(query);
 
+        public class AnyQueryGenerator : EventQueryGenerator
+        {
+            public EventQuery Query { get; set; }
+            public override EventQuery GenerateQuery() => Query;
+            public AnyQueryGenerator(EventQuery query) => Query = query;
+        }
         public class SystemQueryGenerator : EventQueryGenerator
         {
             readonly List<EventQueryGenerator> _gens = new()
@@ -56,17 +60,19 @@ namespace Lib.Eventing
                 new ProviderQueryGenerator(),
                 new LevelQueryGenerator(),
                 new EventIdQueryGenerator(),
+                new IndexQueryGenerator(),
                 new TimeCreatedQueryGenerator(),
             };
-            public ProviderQueryGenerator Provider => (ProviderQueryGenerator)_gens[0];
-            public LevelQueryGenerator Level => (LevelQueryGenerator)_gens[1];
-            public EventIdQueryGenerator EventID => (EventIdQueryGenerator)_gens[2];
-            public TimeCreatedQueryGenerator TimeCreated => (TimeCreatedQueryGenerator)_gens[3];
+            public ProviderQueryGenerator    Provider    => (ProviderQueryGenerator   )_gens[0];
+            public LevelQueryGenerator       Level       => (LevelQueryGenerator      )_gens[1];
+            public EventIdQueryGenerator     EventID     => (EventIdQueryGenerator    )_gens[2];
+            public IndexQueryGenerator       Index       => (IndexQueryGenerator      )_gens[3];
+            public TimeCreatedQueryGenerator TimeCreated => (TimeCreatedQueryGenerator)_gens[4];
             public override EventQuery GenerateQuery() => _gens.Any() ? EventQuery.All.Backet(EventQuery.Of().System(_gens.Select(_ => _.GenerateQuery()))) : EventQuery.All;
         }
         public abstract class AnyValuesQueryGenerator<T> : EventQueryGenerator
         {
-            readonly List<T> _values = new();
+            protected readonly List<T> _values = new();
             public abstract EventQuery GenerateQuery(List<T> values);
             public override EventQuery GenerateQuery() => _values.Any() ? GenerateQuery(_values) : EventQuery.Empty;
             public void Add(params T[] value) => _values.AddRange(value);
@@ -81,9 +87,13 @@ namespace Lib.Eventing
         {
             public override EventQuery GenerateQuery(List<int> values) => EventQuery.Of().EventIs(values);
         }
-        public class LevelQueryGenerator : AnyValuesQueryGenerator<EventLogEntryType>
+        public class IndexQueryGenerator : AnyValuesQueryGenerator<int>
         {
-            public override EventQuery GenerateQuery(List<EventLogEntryType> values) => EventQuery.Of().LevelIs(values);
+            public override EventQuery GenerateQuery(List<int> values) => EventQuery.Of().IndexIs(values);
+        }
+        public class LevelQueryGenerator : AnyValuesQueryGenerator<EventLevel>
+        {
+            public override EventQuery GenerateQuery(List<EventLevel> values) => EventQuery.Of().LevelIs(values.SelectMany(_ => _.Select(__ => __)).Distinct());
         }
         public class TimeCreatedQueryGenerator : EventQueryGenerator
         {

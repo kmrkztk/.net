@@ -58,6 +58,8 @@ namespace Lib.Configuration
         public static T Load<T>(ConfigWachedEventHandler changed) => Load<T>(typeof(T).GetCustomAttribute<ConfigAttribute>(), changed);
         public static T Load<T>(ConfigAttribute attribute) => Load<T>(attribute, null);
         public static T Load<T>(ConfigAttribute attribute, ConfigWachedEventHandler changed) => Load<T>(attribute.FileName, ConfigLoader.GetLoader(attribute.Type), attribute.Watching, changed);
+        public static T Load<T>(string filename, ConfigLoader loader) => Load<T>(filename, loader, null);
+        public static T Load<T>(string filename, ConfigLoader loader, ConfigWachedEventHandler changed) => Load<T>(filename, loader, false, changed);
         public static T Load<T>(string filename, ConfigLoader loader, bool watch) => Load<T>(filename, loader, watch, null);
         public static T Load<T>(string filename, ConfigLoader loader, bool watch, ConfigWachedEventHandler changed)
         {

@@ -117,22 +117,15 @@ namespace Lib.Eventing
         public EventQuery TimeCreatedDiffHour(int value) => TimeCreated(Of().TimeDiffHour(value));
         public EventQuery TimeCreatedDiffDay(int value) => TimeCreated(Of().TimeDiffDay(value));
         public EventQuery Equal() => Next(" = ");
-        public EventQuery GreaterThan() => Next(" &gt; ");
-        public EventQuery GreaterEqual() => Next(" &gt;= ");
-        public EventQuery LessThan() => Next(" &lt; ");
-        public EventQuery LessEqual() => Next(" &lt;= ");
+        public EventQuery GreaterThan() => Next(" > ");
+        public EventQuery GreaterEqual() => Next(" >= ");
+        public EventQuery LessThan() => Next(" < ");
+        public EventQuery LessEqual() => Next(" <= ");
         public EventQuery Value(string value) => Next($"'{value}'");
         public EventQuery Value(int value) => Next($"{value}");
         public EventQuery Value(DateTime value) => Value(value.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
-        public EventQuery Value(EventLogEntryType level) => Value(level switch
-        {
-            EventLogEntryType.FailureAudit => 1,
-            EventLogEntryType.Error => 2,
-            EventLogEntryType.Warning => 3,
-            EventLogEntryType.Information => 4,
-            EventLogEntryType.SuccessAudit => 5,
-            _ => 0,
-        });
+        public EventQuery Value(EventLevel value) => Value(value.Value);
+        public EventQuery Value(EventLogEntryType level) => Value((EventLevel)level);
         public EventQuery Key(string key) => Next($"@{key}");
         public EventQuery Name() => Key("Name");
         public EventQuery SystemTime() => Key("SystemTime");
@@ -144,11 +137,16 @@ namespace Lib.Eventing
         public EventQuery TimeDiffHour(int value) => TimeDiff(TimeSpan.FromHours(value));
         public EventQuery TimeDiffDay(int value) => TimeDiff(TimeSpan.FromDays(value));
         public EventQuery Level() => Next("Level");
-        public EventQuery LevelIs(params EventLogEntryType[] levels) => Parenthese(levels.Select(_ => Of().Level().Equal().Value(_)));
+        public EventQuery LevelIs(params EventLevel[] levels) => Parenthese(levels.Select(_ => Of().Level().Equal().Value(_)));
+        public EventQuery LevelIs(IEnumerable<EventLevel> levels) => LevelIs(levels.ToArray());
+        public EventQuery LevelIs(params EventLogEntryType[] levels) => LevelIs(levels.Select(_ => (EventLevel)_));
         public EventQuery LevelIs(IEnumerable<EventLogEntryType> levels) => LevelIs(levels.ToArray());
         public EventQuery Event() => Next("EventID");
         public EventQuery EventIs(params int[] id) => Parenthese(id.Select(_ => Of().Event().Equal().Value(_)));
         public EventQuery EventIs(IEnumerable<int> id) => EventIs(id.ToArray());
+        public EventQuery Index() => Next("EventRecordID");
+        public EventQuery IndexIs(params int[] id) => Parenthese(id.Select(_ => Of().Index().Equal().Value(_)));
+        public EventQuery IndexIs(IEnumerable<int> id) => IndexIs(id.ToArray());
         public static EventQuery Of(string value = "") => new(value);
         public static EventQuery Empty => Of();
         public static EventQuery All => Of("*");

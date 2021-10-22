@@ -61,9 +61,10 @@ namespace Lib.Logs
         public LogCaller Caller { get; init; }
         public void Out() => Out(null);
         public void Out(object obj) => Out("{0}", obj);
-        public void Out(string format, params object[] args)
+        public void Out(string format, params object[] args) => Out(string.Format(format, args));
+        public void Out(string value)
         {
-            var param = Parameters.Generate(this, string.Format(format, args));
+            var param = Parameters.Generate(this, value);
             Listener.Where(_ => _.Level <= Level).Do(_ => _.Out(param));
         }
     }
