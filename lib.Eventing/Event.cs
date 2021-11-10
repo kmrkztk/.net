@@ -13,16 +13,16 @@ namespace Lib.Eventing
     [SupportedOSPlatform("windows")]
     public class Event
     {
-        public long? Index          { get; set; }
-        public long? ID             { get; set; }
-        public string Log           { get; set; }
-        public string Source        { get; set; }
-        public string Category      { get; set; }
-        public string UserName      { get; set; }
-        public string MachineName   { get; set; }
-        public string Message       { get; set; }
-        public EventLevel Level     { get; set; }
-        public DateTime? DateTime   { get; set; }
+        public long? Index { get; set; }
+        public long? ID { get; set; }
+        public string Log { get; set; }
+        public string Source { get; set; }
+        public string Category { get; set; }
+        public string UserName { get; set; }
+        public string MachineName { get; set; }
+        public string Message { get; set; }
+        public EventLevel Level { get; set; }
+        public DateTime? DateTime { get; set; }
         public override string ToString() => ToString(false);
         public string ToString(bool message) =>
             $"[{Log}] " +
@@ -55,17 +55,19 @@ namespace Lib.Eventing
             //Category = record.Category,
             UserName = record.UserId?.Value,
             MachineName = record.MachineName,
-            Message = record.FormatDescription().TrimEnd("\r\n"),
+            Message = Try.Of(() => record.FormatDescription().TrimEnd("\r\n")).Invoke(),
             Level = (EventLevel)record.Level,
             DateTime = record.TimeCreated,
         };
+        public static IEnumerable<Event> Of(string query, string path) => Of(new EventLogQuery(path, PathType.LogName, query));
         public static IEnumerable<Event> Of(EventQuery query, IEnumerable<string> path) => Of(query, path.ToArray());
-        public static IEnumerable<Event> Of(EventQuery query, params string[] path) => path
-            .Select(_ => new EventLogQuery(_, PathType.LogName, query.ToString()))
-            .Select(_ => new EventLogReader(_))
-            .Select(_ => _.ReadAll())
-            .Select(_ => _.AsEvent())
-            .SoftOrder((a, b) => 
+        public static IEnumerable<Event> Of(EventQuery query, params string[] path) => Of(path.Console().Select(_ => new EventLogQuery(_, PathType.LogName, query.ToString())));
+        public static IEnumerable<Event> Of(EventLogQuery query) => Of(new EventLogReader(query));
+        public static IEnumerable<Event> Of(IEnumerable<EventLogQuery> query) => Of(query.Select(_ => new EventLogReader(_)));
+        public static IEnumerable<Event> Of(EventLogReader reader) => reader.ReadAll().AsEvent();
+        public static IEnumerable<Event> Of(IEnumerable<EventLogReader> reader) => reader
+            .Select(_ => Of(_))
+            .SoftOrder((a, b) =>
             {
                 var a_ = a.DateTime?.Ticks ?? 0;
                 var b_ = b.DateTime?.Ticks ?? 0;

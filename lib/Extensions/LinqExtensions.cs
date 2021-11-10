@@ -14,11 +14,13 @@ namespace Lib
         public static void Do<T>(this IEnumerable<T> enums, Action<T> action) => enums.Each(action).Do();
         public static void Do<T>(this IEnumerable<T> enums, Action<T, int> action) => enums.Each(action).Do();
         public static void Do<T>(this IEnumerable<T> enums) { foreach (var _ in enums) { } }
-        public static TResult Do<T, TResult>(this IEnumerable<T> enums, Func<T, TResult, TResult> selector) => Do(enums, default(TResult), selector);
-        public static TResult Do<T, TResult>(this IEnumerable<T> enums, TResult initial, Func<T, TResult, TResult> selector)
+        public static TResult Do<T, TResult>(this IEnumerable<T> enums, Func<T, TResult, TResult> selector) => enums.Do(default, selector);
+        public static TResult Do<T, TResult>(this IEnumerable<T> enums, Func<T, TResult, int, TResult> selector) => enums.Do(default, selector);
+        public static TResult Do<T, TResult>(this IEnumerable<T> enums, TResult initial, Func<T, TResult, TResult> selector) => enums.Do(initial, (_, res, i) => selector(_, res));
+        public static TResult Do<T, TResult>(this IEnumerable<T> enums, TResult initial, Func<T, TResult, int, TResult> selector)
         {
             var result = initial;
-            foreach(var _ in enums) result = selector(_, result);
+            enums.Each((_, i) => result = selector(_, result, i));
             return result;
         }
         public static IEnumerable<T> Each<T>(this IEnumerable<T> enums, Action<T> action) => enums.Each((_, i) => action(_));
@@ -35,9 +37,11 @@ namespace Lib
 
         public static IEnumerable<T> Tail<T>(this IEnumerable<T> enums, int count)
         {
-            var cnt = enums.Count();
-            return enums.Skip(cnt - count);
+            var _ = enums.ToList();
+            return _.Skip(_.Count - count);
         }
+        public static IEnumerable<T> TailIf<T>(this IEnumerable<T> enums, int count) => count < 0 ? enums : enums.Tail(count);
+        public static IEnumerable<T> TakeIf<T>(this IEnumerable<T> enums, int count) => count < 0 ? enums : enums.Take(count);
         public static IEnumerable<T> Distinct<T>(this IEnumerable<T> enums, Comparison<T> comparison) => enums.Distinct(new ComparisonComparer<T>(comparison));
         public static IEnumerable<T> SoftOrder<T>(this IEnumerable<IEnumerable<T>> enums, Comparison<T> comparison) => enums.Skip(1).Do(enums.FirstOrDefault(), (_0, _1) => _1.SoftOrder(_0, comparison));
         public static IEnumerable<T> SoftOrder<T>(this IEnumerable<T> enums1, IEnumerable<T> enums2, Comparison<T> comparison)

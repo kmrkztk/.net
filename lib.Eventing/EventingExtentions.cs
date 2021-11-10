@@ -26,8 +26,8 @@ namespace Lib.Eventing
         {
             using var r = reader;
             EventRecord rec;
-            while ((rec = r.ReadEvent()) != null) yield return rec;
+            while ((rec = r.ReadEventTry()) != null) yield return rec;
         }
-        
+        public static EventRecord ReadEventTry(this EventLogReader reader) => Try.Of(() => reader.ReadEvent()).Invoke();
     }
 }

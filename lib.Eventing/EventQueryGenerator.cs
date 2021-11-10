@@ -17,7 +17,8 @@ namespace Lib.Eventing
     {
         public string QueryString => GenerateQuery().ToString();
         public abstract EventQuery GenerateQuery();
-        public string GenerateXPath(string path0)
+        public string GenerateXPath(string path0, params string[] path) => GenerateXPath(path.Prepend(path0));
+        public string GenerateXPath(IEnumerable<string> path)
         {
             var q = QueryString;
             var sb = new StringBuilder();
@@ -31,14 +32,17 @@ namespace Lib.Eventing
             using var xw = XmlWriter.Create(sb, setting);
 
             xw.WriteStartElement("QueryList");
-            xw.WriteStartElement("Query");
-            xw.WriteAttributeString("Id", "0");
-            xw.WriteAttributeString("Path", path0);
-            xw.WriteStartElement("Select");
-            xw.WriteAttributeString("Path", path0);
-            xw.WriteString(q);
-            xw.WriteEndElement();
-            xw.WriteEndElement();
+            path.Do((_, i) =>
+            {
+                xw.WriteStartElement("Query");
+                xw.WriteAttributeString("Id", i.ToString());
+                xw.WriteAttributeString("Path", _);
+                xw.WriteStartElement("Select");
+                xw.WriteAttributeString("Path", _);
+                xw.WriteString(q);
+                xw.WriteEndElement();
+                xw.WriteEndElement();
+            });
             xw.WriteEndElement();
             xw.Flush();
             return sb.ToString();
@@ -103,7 +107,7 @@ namespace Lib.Eventing
             public void DiffHours(int value) => Diff = TimeSpan.FromHours(value);
             public void DiffDays(int value) => Diff = TimeSpan.FromDays(value);
             public override EventQuery GenerateQuery() =>
-                Diff != null ? EventQuery.Of().TimeCreated(Diff.Value) :
+                Diff != null ? EventQuery.Of().TimeCreated(EventQuery.Of().TimeDiff(Diff.Value).And().TimeDiff().GreaterEqual().Value(0)) :
                 From != null && To != null ? EventQuery.Of().TimeCreated(From.Value, To.Value) : 
                 From != null ? EventQuery.Of().TimeCreatedFrom(From.Value) :
                 To   != null ? EventQuery.Of().TimeCreatedTo  (To  .Value) :

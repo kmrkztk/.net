@@ -8,6 +8,11 @@ namespace Lib
 {
     public static class ConsoleEx
     {
+        public static string WriteLine(string message)
+        {
+            Console.WriteLine(message);
+            return message;
+        }
         public static void Pause()
         {
             Console.WriteLine("please type any key...");

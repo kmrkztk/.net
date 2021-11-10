@@ -91,7 +91,7 @@ namespace Lib
         }
 
         public new static FileArguments Load() => Load(Environment.GetCommandLineArgs().Skip(1));
-        public new static FileArguments Load(IEnumerable<string> args) => new FileArguments(args);
+        public new static FileArguments Load(IEnumerable<string> args) => new(args);
     }
     public class FileArguments<T> : FileArguments
     {
@@ -101,10 +101,10 @@ namespace Lib
         protected override void Initialize()
         {
             base.Initialize();
-            _options = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
+            _options = (T)typeof(T).GetConstructor(Array.Empty<Type>()).Invoke(Array.Empty<object>());
             _map.Add(PropertyMap.Of(_options));
         }
         public new static FileArguments<T> Load() => Load(Environment.GetCommandLineArgs().Skip(1));
-        public new static FileArguments<T> Load(IEnumerable<string> args) => new FileArguments<T>(args);
+        public new static FileArguments<T> Load(IEnumerable<string> args) => new(args);
     }
 }
