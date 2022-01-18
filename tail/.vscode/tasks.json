@@ -1,0 +1,75 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "clean",
+        "type": "shell",
+        "command": "dotnet",
+        "args": [ 
+          "msbuild",
+          "${workspaceFolder}\\${workspaceFolderBasename}.csproj",
+          "/t:clean",
+          "/v:m"
+        ],
+        "presentation" : {
+          "focus": true
+        },
+        "group": "build",
+        "problemMatcher": "$msCompile"
+      },
+      {
+        "label": "build",
+        "type": "shell",
+        "command": "dotnet",
+        "args": [ 
+          "msbuild",
+          "${workspaceFolder}\\${workspaceFolderBasename}.csproj",
+          "/t:build",
+          "/p:Configuration=Debug",
+          "/v:m"
+        ],
+        "presentation" : {
+          "focus": true
+        },
+        "group": "build",
+        "problemMatcher": "$msCompile"
+      },
+      {
+        "label": "rebuild",
+        "type": "shell",
+        "command": "dotnet",
+        "args": [ 
+          "msbuild",
+          "${workspaceFolder}\\${workspaceFolderBasename}.csproj",
+          "/t:rebuild",
+          "/p:Configuration=Debug",
+          "/v:m"
+        ],
+        "presentation" : {
+          "focus": true
+        },
+        "group": "build",
+        "problemMatcher": "$msCompile"
+      },
+      {
+        "label": "release",
+        "type": "shell",
+        "command": "dotnet",
+        "args": [ 
+          "msbuild",
+          "${workspaceFolder}\\${workspaceFolderBasename}.csproj",
+          "/t:rebuild",
+          "/p:Configuration=Release",
+          "/v:m"
+        ],
+        "presentation" : {
+          "focus": true
+        },
+        "group": "build",
+        "problemMatcher": "$msCompile"
+      },
+    ]
+  }

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "tail": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\iis\\DeRISK_test\\if_master\\logs\\api.log /f"
+    }
+  }
+}
