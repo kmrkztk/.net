@@ -4,19 +4,9 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PlatformTarget>x64</PlatformTarget>
     <OutputPath>..\bin</OutputPath>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.Diagnostics.EventLog" Version="5.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\lib.Eventing\lib.Eventing.csproj" />
-    <ProjectReference Include="..\lib\lib.csproj" />
-  </ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@
   "profiles": {
     "evvw": {
       "commandName": "Project",
-      "commandLineArgs": "/d 1 /error IfLog Application"
+      "commandLineArgs": "/error IfLog /follow"
     }
   }
 }

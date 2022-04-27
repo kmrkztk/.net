@@ -29,6 +29,12 @@ namespace Lib
             action(_, i);
             return _;
         });
+        public static IEnumerable<T> Each<T>(this IEnumerable<T> enums, Predicate<T> predicate, Action<T> action) => enums.Each(predicate, (_, i) => action(_));
+        public static IEnumerable<T> Each<T>(this IEnumerable<T> enums, Predicate<T> predicate, Action<T, int> action) => enums.Select((_, i) =>
+        {
+            if (predicate(_)) action(_, i);
+            return _;
+        });
         public static IEnumerable<T> AsEnumerable<T>(this Array array) => array.AsEnumerable().Cast<T>();
         public static IEnumerable AsEnumerable(this Array array)
         {
@@ -111,6 +117,9 @@ namespace Lib
         public static IEnumerable<T> Console<T>(this IEnumerable<T> enums) => enums.Console(_ => _?.ToString());
         public static IEnumerable<T> Console<T>(this IEnumerable<T> enums, string message) => enums.Console(_ => string.Format(message, _));
         public static IEnumerable<T> Console<T>(this IEnumerable<T> enums, Func<T, string> action) => enums.Each(_ => System.Console.WriteLine(action(_)));
+        public static IEnumerable<T> Console<T>(this IEnumerable<T> enums, Predicate<T> predicate) => enums.Console(predicate, _ => _?.ToString());
+        public static IEnumerable<T> Console<T>(this IEnumerable<T> enums, Predicate<T> predicate, string message) => enums.Console(predicate, _ => string.Format(message, _));
+        public static IEnumerable<T> Console<T>(this IEnumerable<T> enums, Predicate<T> predicate, Func<T, string> action) => enums.Each(predicate, _ => System.Console.WriteLine(action(_)));
         #endregion
         #region exception
         public static IEnumerable<T> Catch<T>(this IEnumerable<T> enums) => enums.Catch(null);

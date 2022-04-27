@@ -24,15 +24,10 @@ namespace Lib.Eventing
         public EventLevel Level { get; set; }
         public DateTime? DateTime { get; set; }
         public override string ToString() => ToString(false);
-        public string ToString(bool message) =>
-            $"[{Log}] " +
-            $"#{Index} " +
-            $":{ID} " +
-            $"[{Level}] " +
-            $"{DateTime} " +
-            $"{Source} " +
-            (message ? $"\r\n{Message}" : "") +
-            "";
+        public string ToString(bool message) => ToString("[{log}] #{index} :{id} [{level}] {datetime} {source} " + (message ? "\r\n{message}" : ""));
+        public string ToString(string format) => format?.ReplaceKeywords(
+            new[] { "log", "index", "id", "level", "datetime", "source", "category", "user", "machine", "message", },
+            new[] { Log, Index?.ToString(), ID?.ToString(), Level.ToString(), DateTime?.ToString(), Source, Category, UserName, MachineName, Message, });
         public static Event Of(EventLogEntry entry) => new()
         {
             //Log = entry.Container,
@@ -60,8 +55,9 @@ namespace Lib.Eventing
             DateTime = record.TimeCreated,
         };
         public static IEnumerable<Event> Of(string query, string path) => Of(new EventLogQuery(path, PathType.LogName, query));
+        public static IEnumerable<Event> Of(string query, params string[] path) => Of(path.Select(_ => new EventLogQuery(_, PathType.LogName, query)));
         public static IEnumerable<Event> Of(EventQuery query, IEnumerable<string> path) => Of(query, path.ToArray());
-        public static IEnumerable<Event> Of(EventQuery query, params string[] path) => Of(path.Console().Select(_ => new EventLogQuery(_, PathType.LogName, query.ToString())));
+        public static IEnumerable<Event> Of(EventQuery query, params string[] path) => Of(query.ToString(), path);
         public static IEnumerable<Event> Of(EventLogQuery query) => Of(new EventLogReader(query));
         public static IEnumerable<Event> Of(IEnumerable<EventLogQuery> query) => Of(query.Select(_ => new EventLogReader(_)));
         public static IEnumerable<Event> Of(EventLogReader reader) => reader.ReadAll().AsEvent();

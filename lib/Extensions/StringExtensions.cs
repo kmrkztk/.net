@@ -32,7 +32,7 @@ namespace Lib
         public static string ReplaceKeywords(this string input, string[] keys, string[] parameters) => ReplaceKeywords(input, RegexOptions.IgnoreCase, keys, parameters);
         public static string ReplaceKeywords(this string input, RegexOptions option, string[] keys, string[] parameters)
         {
-            for (var i = 0; i < keys.Length; i++) input = Regex.Replace(input, "{" + keys[i] + "([^}]*)}", parameters[i], option);
+            for (var i = 0; i < keys.Length; i++) input = Regex.Replace(input, "{" + keys[i] + "([^}]*)}", parameters[i] ?? "", option);
             return input;
         }
         public static string ReplaceKeywords(this string input, string key) => ReplaceKeywords(input, new[] { key });

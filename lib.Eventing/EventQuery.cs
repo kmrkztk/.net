@@ -37,6 +37,7 @@ namespace Lib.Eventing
         {
             var sb = new StringBuilder();
             Write(sb);
+            Trace.WriteLine(sb);
             return sb.ToString();
         }
         protected virtual void Write(StringBuilder sb)
@@ -123,7 +124,7 @@ namespace Lib.Eventing
         public EventQuery LessEqual() => Next(" <= ");
         public EventQuery Value(string value) => Next($"'{value}'");
         public EventQuery Value(int value) => Next($"{value}");
-        public EventQuery Value(DateTime value) => Value(value.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+        public EventQuery Value(DateTime value) => Value(value.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
         public EventQuery Value(EventLevel value) => Value(value.Value);
         public EventQuery Value(EventLogEntryType level) => Value((EventLevel)level);
         public EventQuery Key(string key) => Next($"@{key}");
