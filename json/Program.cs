@@ -15,16 +15,14 @@ namespace json
         static void Main()
         {
             var a = FileArguments<Options>.Load();
-            foreach (var json in a.GetReaders()
-                .Select(_ =>
-                {
-                    if (!a.Options.Raw) _.Seek('{', '[');
-                    return _;
-                })
-                .Select(_ => Json.Load(_)))
-            {
-                foreach (var j in json.Find(a.Options.Key.ToArray())) Console.WriteLine(j is JsonValue ? j.ToString() : j.Format(a.Options.Settings));
-            }
+            var key = a.Options.Key.ToArray();
+            var setting = a.Options.Settings;
+            a   .GetReaders()
+                .Each(_ => !a.Options.Raw, _ => _.Seek('{', '['))
+                .Select(_ => Json.Load(_))
+                .SelectMany(_ => _.Find(key))
+                .Console(_ => _ is JsonValue ? _.ToString() : _.Format(setting))
+                .Do();
 #if DEBUG
             ConsoleEx.Pause();
 #endif
@@ -38,7 +36,14 @@ namespace json
             [Command]
             [CommandValue]
             public string Keys { get => string.Join(".", Key); set => Key = value.Split(".").ToList(); }
-            public bool HasKey => Key.Count > 0;
+            [Command]
+            [Command("w")]
+            [CommandValue]
+            public Dictionary<string, string> Where { get; set; }
+            [Command("nested")]
+            public bool NestedKeys { get; set; }
+
+            // format
             [Command("indent-char")]
             [CommandValue]
             public char IndentChar { get; set; } = ' ';
@@ -53,6 +58,8 @@ namespace json
             public bool NoFormat { get; set; }
             [Command]
             public bool Raw { get; set; }
+
+            public bool HasKey => Key.Count > 0;
             public JsonFormatSettings Settings => new()
             {
                 Indent = Indent,

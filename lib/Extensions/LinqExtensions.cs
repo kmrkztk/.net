@@ -29,11 +29,12 @@ namespace Lib
             action(_, i);
             return _;
         });
+        public static IEnumerable<T> Each<T>(this IEnumerable<T> enums, Func<bool> predicate, Action<T> action) => enums.Each(_ => predicate(), _ => action(_));
         public static IEnumerable<T> Each<T>(this IEnumerable<T> enums, Predicate<T> predicate, Action<T> action) => enums.Each(predicate, (_, i) => action(_));
-        public static IEnumerable<T> Each<T>(this IEnumerable<T> enums, Predicate<T> predicate, Action<T, int> action) => enums.Select((_, i) =>
+        public static IEnumerable<T> Each<T>(this IEnumerable<T> enums, Predicate<T> predicate, Action<T, int> action) => enums.Each((_, i) => predicate(_), action);
+        public static IEnumerable<T> Each<T>(this IEnumerable<T> enums, Func<T, int, bool> predicate, Action<T, int> action) => enums.Each((_, i) =>
         {
-            if (predicate(_)) action(_, i);
-            return _;
+            if (predicate(_, i)) action(_, i);
         });
         public static IEnumerable<T> AsEnumerable<T>(this Array array) => array.AsEnumerable().Cast<T>();
         public static IEnumerable AsEnumerable(this Array array)
